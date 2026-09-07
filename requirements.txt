@@ -1,0 +1,6 @@
+pandas>=2.0
+numpy>=1.24
+matplotlib>=3.7
+jupyter>=1.0
+# Optional: only needed for the yfinance data path (run locally, not in CI)
+yfinance>=0.2.40
