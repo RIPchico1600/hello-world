@@ -1,0 +1,110 @@
+/* Harvard / HBS resume layout, rebuilt to match the original Calibri LibreOffice file.
+   Carlito is metric-compatible with Calibri, so line breaks land in the same places. */
+
+@page {
+  size: A4;
+  margin: 18mm 18mm 15mm 18mm;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Carlito, Calibri, "Liberation Sans", Arial, sans-serif;
+  font-size: 11pt;
+  line-height: 1.30;
+  color: #000;
+  -webkit-print-color-adjust: exact;
+}
+
+/* ---------- header ---------- */
+
+.name {
+  text-align: center;
+  font-size: 16.5pt;
+  font-weight: bold;
+  letter-spacing: 0.4pt;
+  margin: 0 0 1.5pt 0;
+}
+
+.headline {
+  text-align: center;
+  font-size: 11pt;
+  margin: 0 0 2.5pt 0;
+}
+
+.contact {
+  text-align: center;
+  font-size: 10.5pt;
+  margin: 0 0 13pt 0;
+}
+
+.contact a {
+  color: #0563c1;
+  text-decoration: none;
+}
+
+/* ---------- sections ---------- */
+
+h2 {
+  font-size: 11pt;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.3pt;
+  margin: 13pt 0 5pt 0;
+  padding-bottom: 1.8pt;
+  border-bottom: 0.5pt solid #000;
+}
+
+h2:first-of-type { margin-top: 3pt; }
+
+.entry { margin-bottom: 9.5pt; }
+.entry:last-child { margin-bottom: 0; }
+
+/* org line: name+location left, dates flush right */
+.line {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8pt;
+}
+
+.org { font-weight: bold; }
+.loc { font-weight: normal; }
+
+.dates {
+  font-weight: bold;
+  font-style: italic;
+  white-space: nowrap;
+}
+
+.role {
+  font-style: italic;
+  margin: 0;
+}
+
+/* ---------- bullets ---------- */
+
+ul {
+  margin: 3pt 0 0 0;
+  padding-left: 14pt;
+}
+
+li {
+  margin: 0 0 3pt 0;
+  text-align: left;
+}
+
+li:last-child { margin-bottom: 0; }
+
+.detail {
+  margin: 1.5pt 0 0 0;
+}
+
+.kv { margin: 0 0 4.5pt 0; }
+.kv:last-child { margin-bottom: 0; }
+.kv b { font-weight: bold; }
