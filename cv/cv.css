@@ -87,6 +87,9 @@ h2:first-of-type { margin-top: 3pt; }
   margin: 0;
 }
 
+/* second role at the same employer */
+.subrole { margin-top: 4pt; }
+
 /* ---------- bullets ---------- */
 
 ul {
