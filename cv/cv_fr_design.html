@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Paolo Khoury - CV</title>
+<style>
+/* ---------------------------------------------------------------
+   Version "mise en page" : deux colonnes, photo, une couleur d'accent.
+   A envoyer par mail, a un contact direct, en forum ou a un professeur.
+   Pour les candidatures en ligne (ATS), utiliser Paolo_Khoury_CV_FR.pdf.
+
+   PHOTO : remplacer le bloc .photo par
+     <img class="photo" src="photo.jpg" alt="">
+   puis relancer build.sh. Format carre, 600x600 px minimum.
+   --------------------------------------------------------------- */
+
+@page { size: A4; margin: 0; }
+
+:root {
+  --encre:    #161D25;   /* noir profond */
+  --ardoise:  #1D2A36;   /* bandeau */
+  --accent:   #B4653A;   /* cuivre */
+  --accent-c: #D89060;   /* cuivre eclairci, sur fond sombre */
+  --sable:    #F3F2EF;   /* colonne de gauche */
+  --trait:    #DAD8D3;
+  --gris:     #5A6370;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: Inter, Carlito, "Liberation Sans", Arial, sans-serif;
+  font-size: 8.7pt;
+  line-height: 1.32;
+  color: var(--encre);
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.page {
+  width: 210mm;
+  min-height: 297mm;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ================= bandeau ================= */
+
+.bandeau {
+  background: var(--ardoise);
+  color: #fff;
+  padding: 7mm 13mm 6.5mm 13mm;
+  display: flex;
+  align-items: center;
+  gap: 9mm;
+}
+
+.photo {
+  width: 27mm;
+  height: 27mm;
+  flex: 0 0 27mm;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #2B3A48;
+  border: 1.2pt solid var(--accent-c);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22pt;
+  font-weight: 300;
+  letter-spacing: 1.5pt;
+  color: var(--accent-c);
+}
+
+.nom {
+  font-size: 22pt;
+  font-weight: 600;
+  letter-spacing: 1.6pt;
+  line-height: 1.05;
+}
+
+.titre {
+  margin-top: 2mm;
+  font-size: 10pt;
+  font-weight: 500;
+  color: var(--accent-c);
+  letter-spacing: 0.3pt;
+}
+
+.regle {
+  width: 22mm;
+  height: 1.6pt;
+  background: var(--accent-c);
+  margin: 2.6mm 0;
+}
+
+.coord {
+  display: grid;
+  grid-template-columns: 52mm auto;
+  gap: 1.9mm 7mm;
+  font-size: 8.5pt;
+  color: #C9D2DB;
+}
+
+.coord span { display: flex; align-items: center; gap: 1.6mm; }
+.coord svg { flex: 0 0 auto; }
+
+/* ================= colonnes ================= */
+
+.colonnes {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+}
+
+aside {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 56mm;
+  background: var(--sable);
+  padding: 6mm 7mm 6mm 13mm;
+}
+
+main {
+  flex: 1;
+  padding: 6mm 13mm 6mm 8mm;
+}
+
+/* ================= titres de rubrique ================= */
+
+h2 {
+  font-size: 8.6pt;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5pt;
+  color: var(--accent);
+  margin-bottom: 1.1mm;
+}
+
+h2::after {
+  content: "";
+  display: block;
+  width: 9mm;
+  height: 1.4pt;
+  background: var(--accent);
+  margin-top: 1.1mm;
+}
+
+section { margin-bottom: 3.8mm; }
+aside section { margin-bottom: 8.5mm; }
+aside .langue { margin-bottom: 3mm; }
+/* centres d'interet cales en bas de colonne */
+aside section:last-child { margin-top: auto; margin-bottom: 0; }
+section:last-child { margin-bottom: 0; }
+
+/* ================= colonne de gauche ================= */
+
+aside .groupe { margin-bottom: 3.6mm; }
+aside .groupe:last-child { margin-bottom: 0; }
+
+aside .etiquette {
+  font-size: 8.4pt;
+  font-weight: 600;
+  margin-bottom: 0.4mm;
+}
+
+aside p { font-size: 8.4pt; color: #333B45; }
+
+.langue { margin-bottom: 1.9mm; }
+
+.langue .tete {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.7mm;
+}
+
+.langue .nom-langue { font-size: 8.4pt; }
+
+.jauge {
+  height: 3pt;
+  background: #DCD9D2;
+  border-radius: 1.5pt;
+  overflow: hidden;
+}
+
+.jauge i { display: block; height: 100%; background: var(--accent); }
+
+.niveau {
+  font-size: 7.5pt;
+  color: var(--gris);
+}
+
+/* ================= colonne de droite ================= */
+
+.profil { font-size: 8.9pt; line-height: 1.45; }
+
+/* Dates a gauche : l'oeil lit la date puis l'entree, de gauche a droite,
+   sans traverser un blanc. */
+.bloc {
+  display: grid;
+  grid-template-columns: 21mm 1fr;
+  column-gap: 3.5mm;
+  padding-bottom: 1.9mm;
+  margin-bottom: 1.9mm;
+  border-bottom: 0.5pt solid var(--trait);
+}
+
+section > .bloc:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+.date {
+  font-size: 8.3pt;
+  font-weight: 600;
+  color: var(--accent);
+  line-height: 1.32;
+  padding-top: 0.5pt;
+}
+
+.lieu-date {
+  display: block;
+  font-weight: 400;
+  color: var(--gris);
+  font-size: 7.9pt;
+  margin-top: 0.8mm;
+}
+
+.etab { font-size: 9.4pt; font-weight: 600; }
+
+.poste {
+  font-size: 8.7pt;
+  font-weight: 500;
+  color: var(--accent);
+  margin-top: 0.3mm;
+}
+
+.bloc p.txt {
+  font-size: 8.6pt;
+  color: #333B45;
+  margin-top: 0.9mm;
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="bandeau">
+    <!-- remplacer par <img class="photo" src="photo.jpg" alt=""> -->
+    <div class="photo">PK</div>
+    <div>
+      <div class="nom">PAOLO KHOURY</div>
+      <div class="titre">&Eacute;l&egrave;ve-ing&eacute;nieur &middot; Mat&eacute;riaux, M&eacute;canique et &Eacute;nergie</div>
+      <div class="regle"></div>
+      <div class="coord">
+        <span>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#D89060" stroke-width="2.2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="2.6"/></svg>
+          Palaiseau (91), France
+        </span>
+        <span>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#D89060" stroke-width="2.2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .3 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.2a2 2 0 0 1 2.1-.5c.9.4 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg>
+          +33 6 83 41 16 63
+        </span>
+        <span>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#D89060" stroke-width="2.2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg>
+          paolok5@hotmail.com
+        </span>
+        <span>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#D89060" stroke-width="2.2"><rect x="2" y="2" width="20" height="20" rx="2.5"/><path d="M7 10v7M7 7v.01M12 17v-4a2.5 2.5 0 0 1 5 0v4"/></svg>
+          linkedin.com/in/paolo-khoury-452849297
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="colonnes">
+
+    <aside>
+      <section>
+        <h2>Comp&eacute;tences</h2>
+        <div class="groupe">
+          <div class="etiquette">Laboratoire</div>
+          <p>Caract&eacute;risation microstructurale, essais de duret&eacute;, mesures d&rsquo;adh&eacute;rence et de brillance, viscosit&eacute; et densit&eacute;, m&eacute;thodes d&rsquo;essai ASTM.</p>
+        </div>
+        <div class="groupe">
+          <div class="etiquette">Industrie</div>
+          <p>S&eacute;curit&eacute; chimique et gestion des FDS, contr&ocirc;le qualit&eacute; et lib&eacute;ration de lots, lean manufacturing, d&eacute;veloppement durable (DDRS).</p>
+        </div>
+        <div class="groupe">
+          <div class="etiquette">Informatique</div>
+          <p>Python, MATLAB, ERP Apex Pro, suite Microsoft Office (Excel, Word, PowerPoint).</p>
+        </div>
+      </section>
+
+      <section>
+        <h2>Langues</h2>
+        <div class="langue">
+          <div class="tete"><span class="nom-langue">Fran&ccedil;ais</span><span class="niveau">natif</span></div>
+          <div class="jauge"><i style="width:100%"></i></div>
+        </div>
+        <div class="langue">
+          <div class="tete"><span class="nom-langue">Arabe</span><span class="niveau">natif</span></div>
+          <div class="jauge"><i style="width:100%"></i></div>
+        </div>
+        <div class="langue">
+          <div class="tete"><span class="nom-langue">Anglais</span><span class="niveau">C1</span></div>
+          <div class="jauge"><i style="width:80%"></i></div>
+        </div>
+        <div class="langue">
+          <div class="tete"><span class="nom-langue">Espagnol</span><span class="niveau">B1</span></div>
+          <div class="jauge"><i style="width:48%"></i></div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Centres d&rsquo;int&eacute;r&ecirc;t</h2>
+        <div class="groupe">
+          <p>Basket-ball en club et en milieu scolaire.</p>
+        </div>
+        <div class="groupe">
+          <p>Musculation six jours par semaine.</p>
+        </div>
+      </section>
+    </aside>
+
+    <main>
+      <section>
+        <h2>Profil</h2>
+        <p class="profil">&Eacute;l&egrave;ve-ing&eacute;nieur en 4<sup>e</sup> ann&eacute;e &agrave; Polytech Paris-Saclay, sp&eacute;cialit&eacute; Mat&eacute;riaux. Une premi&egrave;re exp&eacute;rience industrielle en contr&ocirc;le qualit&eacute; de peintures et rev&ecirc;tements selon les normes ASTM, et un stage de recherche &agrave; venir en mise en forme des mat&eacute;riaux et technologie des moules &agrave; HUST (Wuhan). Fran&ccedil;ais et arabe langues maternelles, anglais C1.</p>
+      </section>
+
+      <section>
+        <h2>Formation</h2>
+
+        <div class="bloc">
+          <div class="date">Sept. 2025<br>&ndash; en cours<span class="lieu-date">Orsay, France</span></div>
+          <div>
+            <div class="etab">Polytech Paris-Saclay</div>
+            <div class="poste">Dipl&ocirc;me d&rsquo;ing&eacute;nieur, sp&eacute;cialit&eacute; Mat&eacute;riaux (bac+5), pr&eacute;vu en 2028</div>
+            <p class="txt">Parcours Mat&eacute;riaux, M&eacute;canique et &Eacute;nergie&nbsp;: m&eacute;tallurgie, polym&egrave;res et composites, m&eacute;canique des mat&eacute;riaux, thermodynamique et techniques de caract&eacute;risation.</p>
+          </div>
+        </div>
+
+        <div class="bloc">
+          <div class="date">Sept. 2023<br>&ndash; juin 2025<span class="lieu-date">Montpellier, France</span></div>
+          <div>
+            <div class="etab">Polytech Montpellier</div>
+            <div class="poste">Cycle pr&eacute;paratoire int&eacute;gr&eacute; (PeiP)</div>
+            <p class="txt">120 cr&eacute;dits ECTS en physique, chimie, math&eacute;matiques, programmation et d&eacute;veloppement durable (DDRS).</p>
+          </div>
+        </div>
+
+        <div class="bloc">
+          <div class="date">Juin 2023<span class="lieu-date">Al Khobar, Arabie saoudite</span></div>
+          <div>
+            <div class="etab">Lyc&eacute;e fran&ccedil;ais MLF</div>
+            <div class="poste">Baccalaur&eacute;at g&eacute;n&eacute;ral, sp&eacute;cialit&eacute;s Math&eacute;matiques et Physique-Chimie</div>
+            <p class="txt">Mention Tr&egrave;s Bien, moyenne g&eacute;n&eacute;rale de 16/20. Option Math&eacute;matiques expertes.</p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Exp&eacute;rience</h2>
+
+        <div class="bloc">
+          <div class="date">Avril 2027<br>&ndash; ao&ucirc;t 2027<span class="lieu-date">Wuhan, Chine</span></div>
+          <div>
+            <div class="etab">Huazhong University of Science and Technology (HUST)</div>
+            <div class="poste">Stage de recherche (&agrave; venir), State Key Laboratory of Materials Processing and Die &amp; Mould Technology</div>
+            <p class="txt">Cinq mois au sein de l&rsquo;&eacute;quipe mise en forme des mat&eacute;riaux, sur la technologie des moules et matrices&nbsp;: formage des m&eacute;taux, conception d&rsquo;outillage et caract&eacute;risation des proc&eacute;d&eacute;s.</p>
+          </div>
+        </div>
+
+        <div class="bloc">
+          <div class="date">Juin 2024<br>&ndash; ao&ucirc;t 2024<span class="lieu-date">Dammam, Arabie saoudite</span></div>
+          <div>
+            <div class="etab">Oasis Ameron Ltd.</div>
+            <div class="poste">Stagiaire contr&ocirc;le qualit&eacute; et laboratoire</div>
+            <p class="txt">Essais de contr&ocirc;le qualit&eacute; selon les normes ASTM sur peintures &eacute;poxy, r&eacute;sines et primaire antirouille OA&nbsp;9564&nbsp;: viscosit&eacute;, densit&eacute; et finesse de broyage, avec validation des lots avant exp&eacute;dition.</p>
+            <p class="txt">D&eacute;termination de l&rsquo;extrait sec en volume par &eacute;vaporation &agrave; l&rsquo;&eacute;tuve &agrave; 105&nbsp;&deg;C puis bilan massique, donn&eacute;e utilis&eacute;e pour annoncer le rendement th&eacute;orique aux clients.</p>
+            <p class="txt">Suivi d&rsquo;un lot complet de primaire OA&nbsp;9564, de la pes&eacute;e des mati&egrave;res premi&egrave;res &agrave; la dispersion haute vitesse et au conditionnement. Lot conforme d&egrave;s le premier contr&ocirc;le.</p>
+            <p class="txt">Saisie des commandes et tra&ccedil;abilit&eacute; des mati&egrave;res premi&egrave;res sous ERP Apex Pro, et mise &agrave; jour des fiches de donn&eacute;es de s&eacute;curit&eacute; (FDS) des produits du laboratoire.</p>
+          </div>
+        </div>
+
+        <div class="bloc">
+          <div class="date">F&eacute;vr. 2020<span class="lieu-date">Dammam, Arabie saoudite</span></div>
+          <div>
+            <div class="etab">Oasis Ameron Ltd.</div>
+            <div class="poste">Stage d&rsquo;observation de 3<sup>e</sup></div>
+            <p class="txt">D&eacute;couverte d&rsquo;une semaine de la fabrication de peintures et du laboratoire de contr&ocirc;le qualit&eacute;, sur le site du stage de 2024.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+  </div>
+</div>
+</body>
+</html>

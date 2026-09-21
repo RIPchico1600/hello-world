@@ -1,0 +1,96 @@
+/* ATS version: Harvard / HBS layout, single column, no tables, no graphics.
+   Revised after tutor feedback: dates moved to a left gutter instead of being
+   flush right, and bullet glyphs dropped.
+   Carlito is metric-compatible with Calibri. */
+
+@page {
+  size: A4;
+  margin: 16mm 15mm 13mm 15mm;
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; padding: 0; }
+
+body {
+  font-family: Carlito, Calibri, "Liberation Sans", Arial, sans-serif;
+  font-size: 10.1pt;
+  line-height: 1.25;
+  color: #000;
+}
+
+/* ---------- header ---------- */
+
+.name {
+  text-align: center;
+  font-size: 17pt;
+  font-weight: bold;
+  letter-spacing: 0.5pt;
+  margin: 0 0 2pt 0;
+}
+
+.headline {
+  text-align: center;
+  font-size: 10.8pt;
+  margin: 0 0 2.5pt 0;
+}
+
+.contact {
+  text-align: center;
+  font-size: 10.2pt;
+  margin: 0 0 12pt 0;
+}
+
+.contact a { color: #0563c1; text-decoration: none; }
+
+/* ---------- sections ---------- */
+
+h2 {
+  font-size: 10.4pt;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.3pt;
+  margin: 10pt 0 5pt 0;
+  padding-bottom: 1.8pt;
+  border-bottom: 0.5pt solid #000;
+}
+
+h2:first-of-type { margin-top: 3pt; }
+
+/* Dates sit in a left gutter: the eye meets the date first, then the entry,
+   reading left to right with no gap to jump. */
+.entry {
+  display: grid;
+  grid-template-columns: 74pt 1fr;
+  column-gap: 12pt;
+  margin-bottom: 7.5pt;
+}
+
+.entry:last-child { margin-bottom: 0; }
+
+.dates {
+  font-weight: bold;
+  font-size: 9.6pt;
+  line-height: 1.22;
+}
+
+.org { font-weight: bold; }
+.loc { font-weight: normal; }
+
+.role {
+  font-style: italic;
+  margin: 0;
+}
+
+/* a former bullet: its own line, no glyph */
+.pt { margin: 2.5pt 0 0 0; }
+
+.detail { margin: 1.5pt 0 0 0; }
+
+/* second dated role inside the same entry */
+.subrole { margin-top: 6pt; }
+
+/* ---------- skills / interests ---------- */
+
+.kv { margin: 0 0 3.5pt 0; }
+.kv:last-child { margin-bottom: 0; }
