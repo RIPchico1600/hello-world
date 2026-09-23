@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MEF pas à pas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] },
+  svg: { fontCache: 'global' },
+  options: { enableMenu: false }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js"></script>
+<style>
+:root{
+  --paper:#F5F7F7; --sheet:#FFFFFF; --ink:#18212B; --muted:#5A6672; --line:#D9E0E4;
+  --blue:#1F5FA8; --blue-soft:#E6EEF8; --red:#B8402C; --red-soft:#FBEAE6; --green:#2D7A4F; --green-soft:#E5F3EA;
+  --grey-soft:#EEF1F3; --grid:rgba(31,95,168,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --paper:#11161C; --sheet:#171E26; --ink:#E4EAF0; --muted:#98A5B2; --line:#2A3440;
+    --blue:#7FB0EC; --blue-soft:#1B2B40; --red:#F08F7B; --red-soft:#3A221D; --green:#7CCB9C; --green-soft:#1A3326;
+    --grey-soft:#1E262F; --grid:rgba(127,176,236,.05);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --paper:#11161C; --sheet:#171E26; --ink:#E4EAF0; --muted:#98A5B2; --line:#2A3440;
+  --blue:#7FB0EC; --blue-soft:#1B2B40; --red:#F08F7B; --red-soft:#3A221D; --green:#7CCB9C; --green-soft:#1A3326;
+  --grey-soft:#1E262F; --grid:rgba(127,176,236,.05);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:22px 22px;
+  color:var(--ink); font:17px/1.6 "Source Sans 3",system-ui,sans-serif;
+  padding-inline:16px; padding-block:0 64px;
+}
+.wrap{max-width:820px;margin:0 auto}
+header.top{padding-block:40px 20px}
+.eyebrow{font:600 12px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--blue)}
+h1{font:800 clamp(34px,6vw,52px)/1.05 Archivo,system-ui,sans-serif;margin:10px 0 12px;letter-spacing:-.01em;text-wrap:balance}
+h2{font:800 28px/1.15 Archivo,system-ui,sans-serif;margin:0 0 6px;text-wrap:balance}
+h3{font:700 19px/1.3 Archivo,system-ui,sans-serif;margin:26px 0 8px;text-wrap:balance}
+p{margin:8px 0}
+.lede{color:var(--muted);max-width:62ch;margin:0}
+nav.toc{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);border-bottom:1px solid var(--line);padding:10px 0;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+nav.toc a{flex:none;font:600 13px/1 "JetBrains Mono",monospace;color:var(--ink);text-decoration:none;border:1px solid var(--line);background:var(--sheet);border-radius:999px;padding:7px 12px}
+nav.toc a:hover,nav.toc a:focus-visible{border-color:var(--blue);color:var(--blue);outline:none}
+section{background:var(--sheet);border:1px solid var(--line);border-radius:6px;padding:26px clamp(16px,4vw,34px);margin-top:22px;scroll-margin-top:64px}
+.part{font:800 15px/1 Archivo,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:44px 0 0;padding-left:2px}
+.sec-tag{font:600 12px/1 "JetBrains Mono",monospace;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;display:flex;gap:10px;align-items:center}
+.dot{width:11px;height:11px;border-radius:50%;display:inline-block}
+.d-green{background:#2FB26A}.d-blue{background:#2B7BD6}.d-red{background:#D9432B}
+.math{overflow-x:auto;overflow-y:hidden;padding:4px 0}
+mjx-container[display="true"]{margin:10px 0 !important}
+.box{border-radius:4px;padding:12px 16px;margin:14px 0}
+.box > b:first-child{font:700 12px/1 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:6px}
+.keep{background:var(--green-soft);border-left:3px solid var(--green)}
+.keep > b:first-child{color:var(--green)}
+.trap{background:var(--red-soft);border-left:3px solid var(--red)}
+.trap > b:first-child{color:var(--red)}
+.idea{background:var(--blue-soft);border-left:3px solid var(--blue)}
+.idea > b:first-child{color:var(--blue)}
+.why{background:var(--grey-soft);border-left:3px solid var(--muted)}
+.why > b:first-child{color:var(--muted)}
+ol.steps{counter-reset:s;list-style:none;padding:0;margin:12px 0;display:grid;gap:10px}
+ol.steps > li{counter-increment:s;display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:start}
+ol.steps > li::before{content:counter(s);font:700 15px/32px "JetBrains Mono",monospace;text-align:center;width:32px;height:32px;border-radius:50%;background:var(--blue);color:var(--sheet)}
+.tbl{overflow-x:auto;margin:12px 0}
+table{border-collapse:collapse;width:100%;font-size:15.5px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:600 12px/1.2 "JetBrains Mono",monospace;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.q{font:600 13px/1.3 "JetBrains Mono",monospace;color:var(--blue);margin:24px 0 4px}
+.ask{border:1px dashed var(--line);border-radius:4px;padding:10px 14px;margin:10px 0 16px;color:var(--ink)}
+.ask > b:first-child{font:700 12px/1 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:6px;color:var(--muted)}
+ul{padding-left:20px;margin:8px 0}
+li{margin:4px 0}
+figure{margin:16px 0}
+figcaption{font-size:14px;color:var(--muted)}
+svg.fig{width:100%;height:auto;display:block;margin:0 auto}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;align-items:start}
+.res{display:inline-block;border:1.5px solid var(--green);border-radius:4px;padding:2px 10px;margin:4px 0}
+code{font-family:"JetBrains Mono",monospace;font-size:.9em}
+a{color:var(--blue)}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+@media print{
+  nav.toc{display:none}
+  body{background-image:none}
+  section{break-inside:auto}
+  section.ex{break-before:page}
+  .box,figure,.math,.tbl,.ask,ol.steps > li{break-inside:avoid}
+  h2,h3,.q{break-after:avoid}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <div class="eyebrow">MEF · APP4 · version pas à pas</div>
+  <h1>La MEF expliquée simplement</h1>
+  <p class="lede">Deuxième fiche. Ici on prend le temps : chaque notion est expliquée avec une image et un petit exemple chiffré, puis chaque exercice est refait étape par étape en disant <i>pourquoi</i> on fait chaque calcul. L'autre fiche (la courte) sert à relire la veille.</p>
+  <div class="box idea"><b>Comment utiliser cette fiche</b>
+    <ol style="margin:4px 0 0;padding-left:20px">
+      <li>Lis la partie 1 en entier, une fois, sans rien apprendre par cœur (≈ 30 min).</li>
+      <li>Apprends la partie 2 : la recette en 6 étapes et le formulaire. C'est tout ce qu'il faut savoir par cœur.</li>
+      <li>Fais les exos dans l'ordre <b>1 → 2 → 4 → 5 → 3</b>. Cache la solution, fais une étape, compare, passe à la suivante.</li>
+    </ol>
+  </div>
+</header>
+
+<nav class="toc" aria-label="Sommaire">
+  <a href="#c1">1 · Idée</a><a href="#c2">2 · φ</a><a href="#c3">3 · ε</a><a href="#c4">4 · K</a><a href="#c5">5 · F</a><a href="#c6">6 · Appuis</a><a href="#c7">7 · Astuces</a><a href="#recette">Recette</a><a href="#ex1">Ex 1</a><a href="#ex2">Ex 2</a><a href="#ex4">Ex 4</a><a href="#ex5">Ex 5</a><a href="#ex3">Ex 3</a><a href="#pieges">Pièges</a>
+</nav>
+
+<div class="part">Partie 1 — Comprendre</div>
+
+<!-- ========== 1 ========== -->
+<section id="c1">
+  <div class="sec-tag">Cours · 1</div>
+  <h2>Le problème et l'idée de la MEF</h2>
+  <p>Tu tires sur une pièce. Tu veux savoir trois choses, dans cet ordre :</p>
+  <ol>
+    <li>de combien chaque point <b>bouge</b> : le déplacement \(u\) ;</li>
+    <li>de combien la matière <b>s'étire</b> : la déformation \(\varepsilon\) ;</li>
+    <li>quel <b>effort</b> la matière subit : la contrainte \(\sigma\), pour vérifier que ça ne casse pas (\(\sigma &lt; \sigma_e\)).</li>
+  </ol>
+  <p>Pour une barre simple, on sait le faire à la main. Pour une vraie pièce avec des trous et des formes bizarres, impossible. Alors on simplifie :</p>
+  <ol class="steps">
+    <li><div>On découpe la pièce en petits morceaux simples : les <b>éléments</b> (barres, triangles, carrés). L'ensemble s'appelle le <b>maillage</b>.</div></li>
+    <li><div>Les éléments sont reliés par leurs coins : les <b>nœuds</b>.</div></li>
+    <li><div>On ne calcule le déplacement <b>qu'aux nœuds</b>. Entre deux nœuds, on le devine avec une formule simple : l'<b>interpolation</b>.</div></li>
+    <li><div>Chaque élément se comporte comme un <b>ressort</b>. Un assemblage de ressorts se résout avec un système linéaire.</div></li>
+  </ol>
+  <p>Un ressort, tu connais : \(F = k\,u\). Avec plein de ressorts, \(k\) devient une matrice, \(u\) et \(F\) deviennent des vecteurs :</p>
+  <div class="math">\[ \boxed{K\,U = F} \]</div>
+  <div class="box keep"><b>Tout le cours tient là-dedans</b>
+    \(K\) = raideur des ressorts (tu la <b>calcules</b>) · \(F\) = forces appliquées (tu les <b>écris</b>) · \(U\) = déplacements des nœuds (ce que tu <b>cherches</b>). Ensuite, à partir de \(U\), tu calcules \(\varepsilon\) puis \(\sigma\).
+  </div>
+
+  <h3>Le vocabulaire</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Mot</th><th>Ce que c'est</th><th>Exemple</th></tr></thead>
+    <tbody>
+      <tr><td><b>Nœud</b></td><td>point où on calcule le déplacement</td><td>numérotés 1, 2, 3…</td></tr>
+      <tr><td><b>Élément</b></td><td>morceau de pièce entre des nœuds</td><td>barre (2 nœuds), triangle (3), quadrangle (4)</td></tr>
+      <tr><td><b>DDL</b> (degré de liberté)</td><td>une direction dans laquelle un nœud peut bouger</td><td>1D : \(u\) → 1 DDL · plan : \(u, v\) → 2 DDL · logiciel Accord : 3 translations + 3 rotations → 6 DDL</td></tr>
+      <tr><td><b>N</b></td><td>taille du système</td><td>\(N = \text{nb nœuds} \times \text{nb DDL par nœud}\)</td></tr>
+      <tr><td><b>Réaction</b> \(F_R\)</td><td>force que l'appui exerce sur la pièce</td><td>inconnue, on la trouve à la fin</td></tr>
+    </tbody>
+  </table></div>
+  <p>Exemples : 3 nœuds en 1D → \(N=3\), \(K\) est 3×3. Un triangle (3 nœuds) en plan → \(N = 3\times2 = 6\), \(K\) est 6×6.</p>
+
+  <h3>Les 3 formules de RDM de base</h3>
+  <div class="math">\[ \sigma = \frac{F}{S}\qquad\qquad \varepsilon = \frac{\Delta L}{L}=\frac{du}{dx}\qquad\qquad \sigma = E\,\varepsilon\ \ \text{(Hooke)} \]</div>
+  <p>En les combinant : \(\Delta L = \dfrac{FL}{ES}\), soit \(F = \dfrac{ES}{L}\,\Delta L\). Une barre en traction est donc exactement un <b>ressort de raideur \(k = ES/L\)</b>. Retiens cette phrase : elle explique toute la suite.</p>
+</section>
+
+<!-- ========== 2 ========== -->
+<section id="c2">
+  <div class="sec-tag">Cours · 2</div>
+  <h2>L'interpolation : deviner entre les nœuds</h2>
+  <p><b>La question :</b> une barre de longueur \(L\), le nœud 1 bouge de \(u_1\), le nœud 2 de \(u_2\). De combien bouge un point au milieu ? Au quart ?</p>
+  <p><b>Réponse de bon sens :</b> au milieu, c'est la moyenne. Au quart, c'est plus proche de \(u_1\). C'est une simple règle de trois, qu'on écrit :</p>
+  <div class="math">\[ u(x) = \underbrace{\Big(1-\frac{x}{L}\Big)}_{\varphi_1(x)}u_1 + \underbrace{\frac{x}{L}}_{\varphi_2(x)}u_2 \]</div>
+  <p>\(\varphi_i\) est le <b>poids du nœud \(i\)</b> : il dit à quel point le point \(M\) « suit » le nœud \(i\).</p>
+  <div class="box why"><b>Exemple chiffré</b>
+    \(L = 100\) mm, \(u_1 = 0\), \(u_2 = 2\) mm. Point à \(x = 25\) mm : \(\varphi_1 = 0{,}75\), \(\varphi_2 = 0{,}25\) ⇒ \(u = 0{,}75\times0 + 0{,}25\times2 = 0{,}5\) mm. Au milieu : \(u = 1\) mm. Logique.
+  </div>
+  <figure>
+    <svg class="fig" style="max-width:460px" viewBox="0 0 420 190" role="img" aria-label="Fonctions phi1 décroissante de 1 à 0 et phi2 croissante de 0 à 1 le long de la barre">
+      <g font-family="JetBrains Mono, monospace" font-size="12" fill="var(--muted)">
+        <line x1="50" y1="140" x2="380" y2="140" stroke="var(--muted)"/>
+        <line x1="50" y1="140" x2="50" y2="20" stroke="var(--muted)"/>
+        <line x1="50" y1="30" x2="370" y2="30" stroke="var(--line)"/>
+        <text x="42" y="144" text-anchor="end">0</text><text x="42" y="34" text-anchor="end">1</text>
+        <text x="50" y="160" text-anchor="middle">x=0</text><text x="370" y="160" text-anchor="middle">x=L</text>
+        <text x="130" y="160" text-anchor="middle">L/4</text>
+        <text x="50" y="178" text-anchor="middle" fill="var(--ink)">nœud 1</text><text x="370" y="178" text-anchor="middle" fill="var(--ink)">nœud 2</text>
+      </g>
+      <line x1="130" y1="140" x2="130" y2="30" stroke="var(--muted)" stroke-dasharray="3 4"/>
+      <line x1="50" y1="30" x2="370" y2="140" stroke="var(--blue)" stroke-width="2.5"/>
+      <line x1="50" y1="140" x2="370" y2="30" stroke="var(--green)" stroke-width="2.5"/>
+      <circle cx="130" cy="57.5" r="4" fill="var(--blue)"/><circle cx="130" cy="112.5" r="4" fill="var(--green)"/>
+      <g font-family="Source Sans 3, sans-serif" font-size="14">
+        <text x="138" y="54" fill="var(--blue)">φ₁ = 0,75</text>
+        <text x="138" y="126" fill="var(--green)">φ₂ = 0,25</text>
+        <text x="300" y="104" fill="var(--blue)">φ₁ = 1 − x/L</text>
+        <text x="282" y="48" fill="var(--green)">φ₂ = x/L</text>
+      </g>
+    </svg>
+    <figcaption>φ₁ vaut 1 sur le nœud 1 et descend à 0 ; φ₂ fait l'inverse. En tout point, φ₁ + φ₂ = 1.</figcaption>
+  </figure>
+
+  <h3>Les 2 propriétés (et pourquoi elles sont logiques)</h3>
+  <ul>
+    <li><b>\(\varphi_i = 1\) sur le nœud \(i\), et 0 sur les autres nœuds.</b> Normal : un point posé sur le nœud 2, c'est le nœud 2, il bouge de \(u_2\) et de rien d'autre.</li>
+    <li><b>\(\sum_i \varphi_i = 1\) partout.</b> Si tous les nœuds bougent de la même quantité \(a\), tout l'élément bouge de \(a\) : c'est une translation, rien ne se déforme.</li>
+  </ul>
+  <div class="box idea"><b>Vérif de 10 secondes à l'exam</b>
+    Remplace \((x,y)\) par les coordonnées de chaque nœud. \(\varphi_i\) doit donner 1 sur son nœud et 0 sur les autres. Si ce n'est pas le cas, ta fonction est fausse et tout ce qui suit le sera aussi.
+  </div>
+
+  <h3>Le triangle (à savoir par cœur)</h3>
+  <p>Nœud 1 à l'origine, nœud 2 en \((L,0)\), nœud 3 en \((0,H)\) :</p>
+  <div class="math">\[ \varphi_1 = 1-\frac{x}{L}-\frac{y}{H},\qquad \varphi_2 = \frac{x}{L},\qquad \varphi_3 = \frac{y}{H} \]</div>
+  <div class="tbl"><table>
+    <thead><tr><th>On se place sur…</th><th>φ₁</th><th>φ₂</th><th>φ₃</th></tr></thead>
+    <tbody>
+      <tr><td>nœud 1 \((0,0)\)</td><td>1</td><td>0</td><td>0</td></tr>
+      <tr><td>nœud 2 \((L,0)\)</td><td>1−1 = 0</td><td>1</td><td>0</td></tr>
+      <tr><td>nœud 3 \((0,H)\)</td><td>1−1 = 0</td><td>0</td><td>1</td></tr>
+    </tbody>
+  </table></div>
+  <p>En plan, chaque point bouge en \(x\) (noté \(u\)) <b>et</b> en \(y\) (noté \(v\)). On utilise les mêmes \(\varphi\) pour les deux, séparément :</p>
+  <div class="math">\[ u = \varphi_1u_1+\varphi_2u_2+\varphi_3u_3,\qquad v = \varphi_1v_1+\varphi_2v_2+\varphi_3v_3 \]</div>
+
+  <h3>Écrire la matrice d'interpolation A (méthode)</h3>
+  <ol class="steps">
+    <li><div>Écris le vecteur des déplacements des nœuds dans l'ordre : \((u_1, v_1, u_2, v_2, u_3, v_3)\). Il a 6 cases, donc \(A\) a <b>6 colonnes</b>.</div></li>
+    <li><div>\(A\) a <b>une ligne par composante</b> du déplacement : la ligne 1 donne \(u\), la ligne 2 donne \(v\).</div></li>
+    <li><div>Ligne \(u\) : mets \(\varphi_i\) sous chaque \(u_i\), et 0 sous chaque \(v_i\). Ligne \(v\) : l'inverse.</div></li>
+  </ol>
+  <div class="math">\[ \begin{pmatrix}u\\v\end{pmatrix} = \underbrace{\begin{array}{cccccc} \scriptstyle u_1&\scriptstyle v_1&\scriptstyle u_2&\scriptstyle v_2&\scriptstyle u_3&\scriptstyle v_3\\ \hline \varphi_1&0&\varphi_2&0&\varphi_3&0\\ 0&\varphi_1&0&\varphi_2&0&\varphi_3 \end{array}}_{A\ (2\times6)}\ \begin{pmatrix}u_1\\v_1\\u_2\\v_2\\u_3\\v_3\end{pmatrix} \]</div>
+  <p>Vérif : ligne 1 × vecteur \(=\varphi_1u_1+\varphi_2u_2+\varphi_3u_3 = u\). ✓ Pour la barre 1D, c'est pareil en plus petit : \(A = (\varphi_1\ \ \varphi_2)\), 1 ligne, 2 colonnes.</p>
+  <div class="box trap"><b>Piège (dans tes notes)</b>
+    Dans \(A\) on met \(\varphi_i\) <b>seul</b>, jamais \(\varphi_i u_i\). Les \(u_i\) sont dans le vecteur à droite.
+  </div>
+
+  <h3>Le carré à 4 nœuds (astuce pour le retenir)</h3>
+  <p>Carré de côté \(L\) centré en 0. On pose \(\alpha = 2x/L\) et \(\beta = 2y/L\) : les coins sont en \(\alpha,\beta = \pm1\). Chaque fonction est \(\tfrac14(1 \pm \alpha)(1 \pm \beta)\) où les signes sont <b>les coordonnées du nœud</b> :</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Nœud</th><th>Position \((\alpha,\beta)\)</th><th>φ</th></tr></thead>
+    <tbody>
+      <tr><td>1 (bas gauche)</td><td>\((-1,-1)\)</td><td>\(\tfrac14(1-\alpha)(1-\beta)\)</td></tr>
+      <tr><td>2 (bas droite)</td><td>\((+1,-1)\)</td><td>\(\tfrac14(1+\alpha)(1-\beta)\)</td></tr>
+      <tr><td>3 (haut droite)</td><td>\((+1,+1)\)</td><td>\(\tfrac14(1+\alpha)(1+\beta)\)</td></tr>
+      <tr><td>4 (haut gauche)</td><td>\((-1,+1)\)</td><td>\(\tfrac14(1-\alpha)(1+\beta)\)</td></tr>
+    </tbody>
+  </table></div>
+  <p>Vérif nœud 1 : \(\tfrac14\cdot2\cdot2 = 1\). ✓ Sur les autres coins, un des facteurs vaut 0. ✓</p>
+</section>
+
+<!-- ========== 3 ========== -->
+<section id="c3">
+  <div class="sec-tag">Cours · 3</div>
+  <h2>La déformation : de combien ça s'étire</h2>
+  <p>Bouger ne veut pas dire se déformer : si toute la pièce avance de 1 mm, rien ne s'étire. Ce qui compte, c'est la <b>différence</b> de déplacement entre deux points voisins, divisée par leur distance. Mathématiquement : une dérivée.</p>
+  <p><b>En 1D (barre) :</b> \(\varepsilon = \dfrac{du}{dx}\). Exemple : \(u\) passe de 0 à 2 mm sur 100 mm ⇒ \(\varepsilon = 0{,}02 = 2\,\%\).</p>
+  <p><b>En plan</b>, il y a 3 nombres à calculer :</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Terme</th><th>Formule</th><th>Ce que ça mesure</th></tr></thead>
+    <tbody>
+      <tr><td>\(\varepsilon_{xx}\)</td><td>\(\dfrac{\partial u}{\partial x}\)</td><td>étirement horizontal</td></tr>
+      <tr><td>\(\varepsilon_{yy}\)</td><td>\(\dfrac{\partial v}{\partial y}\)</td><td>étirement vertical</td></tr>
+      <tr><td>\(\varepsilon_{xy}\)</td><td>\(\dfrac12\Big(\dfrac{\partial u}{\partial y}+\dfrac{\partial v}{\partial x}\Big)\)</td><td>cisaillement : un carré devient un losange</td></tr>
+    </tbody>
+  </table></div>
+  <p>On les range dans une matrice symétrique : \(\varepsilon=\begin{pmatrix}\varepsilon_{xx}&\varepsilon_{xy}\\ \varepsilon_{xy}&\varepsilon_{yy}\end{pmatrix}\).</p>
+
+  <h3>Méthode en 3 étapes</h3>
+  <ol class="steps">
+    <li><div>Écris \(u(x,y)\) et \(v(x,y)\) avec les \(\varphi\), en remplaçant par 0 les déplacements nodaux nuls.</div></li>
+    <li><div>Calcule les 4 dérivées : \(\partial u/\partial x\), \(\partial u/\partial y\), \(\partial v/\partial x\), \(\partial v/\partial y\).</div></li>
+    <li><div>Range-les dans \(\varepsilon\) (sans oublier le ½) puis lis la nature dans le tableau ci-dessous.</div></li>
+  </ol>
+  <div class="tbl"><table>
+    <thead><tr><th>Tu trouves</th><th>Nature de la déformation</th></tr></thead>
+    <tbody>
+      <tr><td>seul \(\varepsilon_{xx}\neq0\)</td><td>traction selon x si &gt; 0, compression si &lt; 0</td></tr>
+      <tr><td>seul \(\varepsilon_{xy}\neq0\)</td><td>cisaillement pur</td></tr>
+      <tr><td>\(\varepsilon_{xx}\) et \(\varepsilon_{yy}\neq0\), \(\varepsilon_{xy}=0\)</td><td>traction ou compression bi-axiale</td></tr>
+      <tr><td>diagonale et \(\varepsilon_{xy}\) non nuls</td><td>traction/compression + cisaillement</td></tr>
+      <tr><td>tout est nul</td><td>mouvement de corps rigide (la pièce bouge sans se déformer)</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Pour une barre en MEF</h3>
+  <p>Avec \(u = \varphi_1u_1+\varphi_2u_2\), la dérivée donne :</p>
+  <div class="math">\[ \varepsilon = \frac{u_2-u_1}{L_e} = \frac{\text{allongement de l'élément}}{\text{longueur de l'élément}},\qquad \sigma = E\,\varepsilon \]</div>
+  <p>C'est constant dans tout l'élément.</p>
+  <div class="box trap"><b>Piège (dans tes notes)</b>
+    \(L_e\) est la longueur <b>de l'élément</b>, pas de toute la barre. Barre coupée en 2 : on divise par \(L/2\).
+  </div>
+
+  <h3>Critères de résistance (vérifier que ça tient)</h3>
+  <div class="math">\[ \text{Von Mises : } \sigma_{eq}=\sqrt{\tfrac12\left[(\sigma_I-\sigma_{II})^2+(\sigma_{II}-\sigma_{III})^2+(\sigma_{III}-\sigma_I)^2\right]} \]</div>
+  <div class="math">\[ \text{Tresca : } \tau_{max}=\frac{\sigma_I-\sigma_{III}}{2} \]</div>
+  <p>On vérifie \(\sigma_{eq} &lt; \sigma_e\) (limite élastique). Le ½ est <b>dans</b> la racine. Pour une barre en traction simple, \(\sigma_{eq} = |\sigma|\).</p>
+</section>
+
+<!-- ========== 4 ========== -->
+<section id="c4">
+  <div class="sec-tag">Cours · 4</div>
+  <h2>La matrice de rigidité K : les ressorts</h2>
+  <h3>Une barre seule</h3>
+  <p>Une barre = un ressort \(k = ES/L\) entre le nœud 1 et le nœud 2. La force dans le ressort dépend de son allongement \(u_2 - u_1\) :</p>
+  <ul>
+    <li>force à appliquer au nœud 2 : \(F_2 = k(u_2-u_1)\) ;</li>
+    <li>force au nœud 1 : l'opposé, \(F_1 = k(u_1-u_2)\).</li>
+  </ul>
+  <p>En matrice, c'est exactement :</p>
+  <div class="math">\[ \begin{pmatrix}F_1\\F_2\end{pmatrix} = \underbrace{\frac{ES}{L}\begin{pmatrix}1&-1\\-1&1\end{pmatrix}}_{K_e}\begin{pmatrix}u_1\\u_2\end{pmatrix} \]</div>
+  <div class="box why"><b>Vérifs de bon sens</b>
+    Si \(u_1 = u_2\) (translation) : \(F = 0\), rien ne s'étire. ✓ &nbsp;Si \(u_1 = 0\) et \(u_2 = \Delta\) : \(F_2 = k\Delta\) (tu tires en bas), \(F_1 = -k\Delta\) (l'appui retient en haut). ✓
+  </div>
+  <p>D'où vient cette matrice « officiellement » : l'énergie élastique de la barre vaut \(W = \tfrac12\,U^tK_eU\) avec \(K_e=\int_V B^tCB\,dV\), et le principe des travaux virtuels (\(\delta W_{int} = \delta W_{ext}\) pour tout déplacement virtuel) donne \(KU = F\). Sache-le pour une question de cours, mais à l'exam tu utilises directement la formule encadrée.</p>
+
+  <h3>Assembler plusieurs barres : la méthode de la grille</h3>
+  <ol class="steps">
+    <li><div>Dessine une grille N×N. Lignes et colonnes = les nœuds (1, 2, 3…).</div></li>
+    <li><div>Pour chaque élément qui relie les nœuds \(i\) et \(j\), de raideur \(k_e\) : écris \(+k_e\) dans les cases \((i,i)\) et \((j,j)\), et \(-k_e\) dans \((i,j)\) et \((j,i)\).</div></li>
+    <li><div><b>Additionne</b> ce qui tombe dans la même case.</div></li>
+  </ol>
+  <p>Exemple : 2 barres en série, nœuds 1-2 (raideur \(k_1\)) et 2-3 (raideur \(k_2\)) :</p>
+  <div class="math">\[ \underbrace{\begin{pmatrix}k_1&-k_1&0\\-k_1&k_1&0\\0&0&0\end{pmatrix}}_{\text{élément 1}} + \underbrace{\begin{pmatrix}0&0&0\\0&k_2&-k_2\\0&-k_2&k_2\end{pmatrix}}_{\text{élément 2}} = \begin{pmatrix}k_1&-k_1&0\\-k_1&k_1+k_2&-k_2\\0&-k_2&k_2\end{pmatrix} \]</div>
+  <p>Le nœud 2 est accroché à deux ressorts, il reçoit donc \(k_1+k_2\).</p>
+  <div class="box keep"><b>Lire K sans calcul</b>
+    <ul style="margin:0">
+      <li>Diagonale \((i,i)\) = somme des raideurs des barres qui touchent le nœud \(i\).</li>
+      <li>Case \((i,j)\) = \(-k\) si une barre relie \(i\) et \(j\), sinon 0.</li>
+      <li>Vérif (1D) : la somme de chaque ligne vaut 0.</li>
+      <li>Élément de longueur \(L/n\) : \(k = nES/L\) (plus court = plus raide).</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ========== 5 ========== -->
+<section id="c5">
+  <div class="sec-tag">Cours · 5</div>
+  <h2>Le vecteur des forces F</h2>
+  <p>La MEF ne sait appliquer des forces <b>qu'aux nœuds</b>. Il faut donc ramener chaque chargement sur les nœuds.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Chargement</th><th>Ce qu'on met dans F</th><th>Pourquoi</th></tr></thead>
+    <tbody>
+      <tr><td>Force ponctuelle sur un nœud</td><td>directement sur la ligne de ce nœud</td><td>elle est déjà sur un nœud</td></tr>
+      <tr><td>Poids d'une barre de masse \(m\)</td><td>\(mg/2\) sur chacun de ses 2 nœuds</td><td>la barre porte son poids moitié-moitié</td></tr>
+      <tr><td>Nœud partagé par 2 barres</td><td>la moitié du poids de <b>chaque</b> barre</td><td>il porte un bout de chacune</td></tr>
+      <tr><td>Force \(F\) répartie sur un bord de N éléments</td><td>coin : \(F/(2N)\) · nœud intérieur : \(F/N\)</td><td>même logique moitié-moitié</td></tr>
+      <tr><td>Nœud bloqué</td><td>+ une réaction inconnue \(F_R\)</td><td>voir partie 6</td></tr>
+    </tbody>
+  </table></div>
+  <div class="box why"><b>Exemple : barre de masse M coupée en 4</b>
+    Chaque élément pèse \(M/4\) ⇒ \(Mg/8\) à chacune de ses extrémités. Nœuds du bout : \(Mg/8\). Nœuds intérieurs : \(Mg/8 + Mg/8 = Mg/4\). <br>Vérif : \(2\times\frac{Mg}{8} + 3\times\frac{Mg}{4} = Mg\). ✓
+  </div>
+  <div class="box idea"><b>Réflexe</b>
+    La somme des forces de F (sans les réactions) doit toujours donner la charge totale. Et fixe tes signes dès le début : axe x vers le bas ⇒ le poids est positif ; axe y vers le haut ⇒ le poids est négatif.
+  </div>
+</section>
+
+<!-- ========== 6 ========== -->
+<section id="c6">
+  <div class="sec-tag">Cours · 6</div>
+  <h2>Appuis, réactions, et comment résoudre</h2>
+  <p>Un nœud bloqué a un déplacement connu (\(u = 0\)), mais l'appui <b>pousse ou tire</b> dessus : il y a une force inconnue \(F_R\) sur sa ligne. Donc sur chaque ligne il y a exactement <b>une inconnue</b> :</p>
+  <ul>
+    <li>nœud libre : son déplacement est inconnu, sa force est connue ;</li>
+    <li>nœud bloqué : son déplacement est connu (0), sa réaction est inconnue.</li>
+  </ul>
+  <p>N équations, N inconnues : ça se résout toujours.</p>
+  <h3>Ordre de résolution</h3>
+  <ol class="steps">
+    <li><div>Prends les lignes des <b>nœuds libres</b> (celles sans \(F_R\)) et résous-les : tu obtiens les déplacements.</div></li>
+    <li><div>Remplace dans les lignes des <b>nœuds bloqués</b> : tu obtiens les réactions.</div></li>
+    <li><div>Vérifie : somme des réactions = −(somme des forces appliquées).</div></li>
+  </ol>
+  <div class="box keep"><b>L'astuce qui fait gagner 10 minutes (barres suspendues)</b>
+    Additionne les lignes <b>en partant du bas</b>. Pour chaque élément tu obtiens :
+    \[ k_e\times(\text{allongement de l'élément}) = \text{poids de tout ce qui pend en dessous} \]
+    C'est logique : chaque morceau de barre porte tout ce qui est accroché sous lui. Et \(\sigma_e = \dfrac{\text{ce poids}}{S}\) directement.
+  </div>
+</section>
+
+<!-- ========== 7 ========== -->
+<section id="c7">
+  <div class="sec-tag">Cours · 7</div>
+  <h2>Deux astuces : superposition et symétrie</h2>
+  <h3>Superposition</h3>
+  <p>Tout est linéaire. Si le chargement 1 donne \(U_1\) et le chargement 2 donne \(U_2\), alors les deux ensemble donnent \(U_1 + U_2\). Pareil pour les réactions, \(\varepsilon\) et \(\sigma\). On résout chaque chargement séparément puis on <b>additionne</b>.</p>
+  <h3>Symétrie</h3>
+  <p>On peut couper le modèle en deux (ou en quatre) seulement si <b>tout</b> est symétrique : géométrie, matériau, appuis <b>et</b> chargement. Si un seul de ces 4 points ne l'est pas, on ne peut pas.</p>
+  <p>Sur le plan de coupe (le « miroir ») :</p>
+  <ul>
+    <li>on <b>bloque le déplacement perpendiculaire</b> au miroir : un point sur le miroir ne peut pas le traverser, sinon il chevaucherait son jumeau ;</li>
+    <li>on bloque les rotations qui feraient « pencher » la pièce hors du miroir (en 6 DDL : les 2 rotations autour des axes contenus dans le plan) ;</li>
+    <li>une charge posée <b>sur</b> le miroir est coupée en deux.</li>
+  </ul>
+  <p>Intérêt : moins de nœuds, donc un calcul plus rapide, ou un maillage plus fin pour le même coût.</p>
+</section>
+
+<div class="part">Partie 2 — À savoir par cœur</div>
+
+<section id="recette">
+  <div class="sec-tag">La recette d'exam</div>
+  <h2>6 étapes, toujours les mêmes</h2>
+  <ol class="steps">
+    <li><div><b>K de chaque élément</b> : \(\frac{ES}{L}\begin{pmatrix}1&-1\\-1&1\end{pmatrix}\), ou la formule inclinée pour un treillis.</div></li>
+    <li><div><b>Assembler</b> K global (méthode de la grille), taille N×N.</div></li>
+    <li><div><b>Écrire F</b> : forces ponctuelles + poids moitié-moitié. Vérifier la somme.</div></li>
+    <li><div><b>Conditions aux limites</b> : nœud bloqué ⇒ \(u = 0\) et \(+F_R\) sur sa ligne.</div></li>
+    <li><div><b>Résoudre</b> : lignes libres ⇒ déplacements ; lignes bloquées ⇒ réactions.</div></li>
+    <li><div><b>Post-traitement</b> : \(\varepsilon_e = \Delta u/L_e\), \(\sigma_e = E\varepsilon_e\) ; vérifier \(\sigma &lt; \sigma_e\) et \(\sum F_R = -\sum F\) ; dire si c'est de la traction ou de la compression.</div></li>
+  </ol>
+  <h3>Le formulaire</h3>
+  <div class="tbl"><table>
+    <tbody>
+      <tr><td>Système</td><td>\(KU=F\), \(N = \text{nœuds}\times\text{DDL}\)</td></tr>
+      <tr><td>φ barre</td><td>\(\varphi_1 = 1-\frac xL,\ \varphi_2=\frac xL\)</td></tr>
+      <tr><td>φ triangle</td><td>\(\varphi_1 = 1-\frac xL-\frac yH,\ \varphi_2=\frac xL,\ \varphi_3=\frac yH\)</td></tr>
+      <tr><td>φ carré</td><td>\(\frac14(1\pm\alpha)(1\pm\beta)\), \(\alpha=\frac{2x}L,\ \beta=\frac{2y}L\), signes = position du nœud</td></tr>
+      <tr><td>Déformations</td><td>\(\varepsilon_{xx}=\frac{\partial u}{\partial x},\ \varepsilon_{yy}=\frac{\partial v}{\partial y},\ \varepsilon_{xy}=\frac12\big(\frac{\partial u}{\partial y}+\frac{\partial v}{\partial x}\big)\)</td></tr>
+      <tr><td>K barre</td><td>\(\frac{ES}{L}\begin{pmatrix}1&-1\\-1&1\end{pmatrix}\)</td></tr>
+      <tr><td>Poids</td><td>\(mg/2\) par nœud et par barre</td></tr>
+      <tr><td>Post-traitement</td><td>\(\varepsilon_e=\frac{u_j-u_i}{L_e}\), \(\sigma=E\varepsilon\)</td></tr>
+      <tr><td>Von Mises</td><td>\(\sqrt{\frac12[(\sigma_I-\sigma_{II})^2+(\sigma_{II}-\sigma_{III})^2+(\sigma_{III}-\sigma_I)^2]}\)</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<div class="part">Partie 3 — Les exercices, pas à pas</div>
+
+<!-- ========== EX 1 ========== -->
+<section id="ex1" class="ex">
+  <div class="sec-tag"><span class="dot d-green"></span>Exercice 1 · vert</div>
+  <h2>Fonctions d'interpolation d'un triangle</h2>
+  <div class="ask"><b>Ce qu'on te demande</b>
+    Un triangle rectangle isocèle de côté \(L\) (angle droit au nœud 1). (1-1) Écrire les \(\varphi\) et la matrice \(A\). (1-2) Pour 4 cas où certains nœuds bougent (tous les autres déplacements = 0), calculer le déplacement d'un point \(M(x,y)\), la déformation, et dire de quel type elle est.
+  </div>
+  <div class="two">
+    <figure style="margin:0">
+      <svg class="fig" style="max-width:260px" viewBox="0 0 260 220" role="img" aria-label="Triangle : nœud 1 à l'origine, nœud 2 sur l'axe x à distance L, nœud 3 sur l'axe y à distance L">
+        <polygon points="50,180 200,180 50,30" fill="var(--blue-soft)" stroke="var(--ink)" stroke-width="2"/>
+        <g stroke="var(--muted)" fill="var(--muted)">
+          <line x1="50" y1="180" x2="240" y2="180"/><polygon points="240,180 232,176 232,184" stroke="none"/>
+          <line x1="50" y1="180" x2="50" y2="10"/><polygon points="50,10 46,18 54,18" stroke="none"/>
+        </g>
+        <circle cx="50" cy="180" r="5" fill="var(--ink)"/><circle cx="200" cy="180" r="5" fill="var(--ink)"/><circle cx="50" cy="30" r="5" fill="var(--ink)"/>
+        <circle cx="95" cy="140" r="3.5" fill="var(--red)"/>
+        <g font-family="Source Sans 3, sans-serif" font-size="15" fill="var(--ink)">
+          <text x="30" y="200">1</text><text x="196" y="202">2</text><text x="30" y="36">3</text>
+          <text x="102" y="138" fill="var(--red)">M(x,y)</text>
+          <text x="120" y="198" fill="var(--muted)">L</text><text x="30" y="110" fill="var(--muted)">L</text>
+          <text x="244" y="186" fill="var(--muted)">x</text><text x="56" y="16" fill="var(--muted)">y</text>
+        </g>
+      </svg>
+    </figure>
+    <div>
+      <p class="q">1-1 · Les φ et la matrice A</p>
+      <p>C'est le triangle du cours avec \(H = L\). On recopie :</p>
+      <div class="math">\[ \varphi_1 = 1-\frac{x}{L}-\frac{y}{L},\quad \varphi_2=\frac{x}{L},\quad \varphi_3=\frac{y}{L} \]</div>
+      <p>Vérif rapide sur les 3 nœuds : ça donne bien 1 sur son nœud, 0 ailleurs. ✓</p>
+    </div>
+  </div>
+  <p>2 DDL par nœud, 3 nœuds ⇒ \(A\) fait 2 lignes × 6 colonnes :</p>
+  <div class="math">\[ \begin{pmatrix}u\\v\end{pmatrix}=\begin{pmatrix}\varphi_1&0&\varphi_2&0&\varphi_3&0\\0&\varphi_1&0&\varphi_2&0&\varphi_3\end{pmatrix}\begin{pmatrix}u_1\\v_1\\u_2\\v_2\\u_3\\v_3\end{pmatrix} \]</div>
+
+  <p class="q">1-2 · Cas 1 : seul u₂ ≠ 0</p>
+  <p><b>Image :</b> on tire le nœud 2 vers la droite, les autres ne bougent pas.</p>
+  <p><b>Déplacement :</b> tous les autres \(u_i, v_i\) sont nuls, donc \(u = \varphi_2 u_2 = u_2\dfrac{x}{L}\) et \(v = 0\).</p>
+  <p><b>Dérivées :</b> \(\dfrac{\partial u}{\partial x} = \dfrac{u_2}{L}\), et les trois autres sont nulles.</p>
+  <div class="math">\[ \varepsilon = \begin{pmatrix}u_2/L & 0\\ 0 & 0\end{pmatrix} \]</div>
+  <p><b>Nature :</b> seul \(\varepsilon_{xx}\) est non nul ⇒ <b>traction selon x</b>. Le triangle s'étire horizontalement.</p>
+
+  <p class="q">1-2 · Cas 2 : seul u₃ ≠ 0</p>
+  <p><b>Image :</b> on pousse le sommet du haut (nœud 3) vers la droite, la base ne bouge pas. Comme un paquet de cartes qu'on pousse par le dessus.</p>
+  <p><b>Déplacement :</b> \(u = \varphi_3u_3 = u_3\dfrac{y}{L}\), \(v = 0\).</p>
+  <p><b>Dérivées :</b> \(u\) dépend de \(y\) seulement ⇒ \(\dfrac{\partial u}{\partial y} = \dfrac{u_3}{L}\), les autres sont nulles. Donc \(\varepsilon_{xy} = \tfrac12\cdot\dfrac{u_3}{L}\).</p>
+  <div class="math">\[ \varepsilon = \begin{pmatrix}0 & \frac{u_3}{2L}\\ \frac{u_3}{2L} & 0\end{pmatrix} \]</div>
+  <p><b>Nature :</b> seul \(\varepsilon_{xy}\) est non nul ⇒ <b>cisaillement pur</b>.</p>
+
+  <p class="q">1-2 · Cas 3 : u₁ = u₂ = u₃ (notons a)</p>
+  <p><b>Image :</b> les trois nœuds avancent de la même quantité vers la droite.</p>
+  <p><b>Déplacement :</b> \(u = a\varphi_1 + a\varphi_2 + a\varphi_3 = a(\varphi_1+\varphi_2+\varphi_3) = a\) (car \(\sum\varphi_i = 1\)), et \(v = 0\).</p>
+  <p><b>Dérivées :</b> \(u\) est constant ⇒ toutes les dérivées sont nulles ⇒ \(\varepsilon = 0\).</p>
+  <p><b>Nature :</b> <b>translation</b> (mouvement de corps rigide), aucune déformation. C'est exactement la propriété \(\sum\varphi_i = 1\).</p>
+
+  <p class="q">1-2 · Cas 4 : u₁ = v₁ (notons a), le reste nul</p>
+  <p><b>Image :</b> le nœud 1 (l'angle droit) part en diagonale, vers l'intérieur du triangle, les deux autres nœuds restent fixes.</p>
+  <p><b>Déplacement :</b> \(u = a\varphi_1\) et \(v = a\varphi_1\), avec \(\varphi_1 = 1 - \frac{x}{L} - \frac{y}{L}\).</p>
+  <p><b>Dérivées :</b> \(\varphi_1\) a pour dérivée \(-\frac1L\) en \(x\) comme en \(y\). Donc les 4 dérivées valent \(-\dfrac{a}{L}\).</p>
+  <div class="math">\[ \varepsilon_{xx} = -\frac aL,\qquad \varepsilon_{yy} = -\frac aL,\qquad \varepsilon_{xy} = \frac12\Big(-\frac aL-\frac aL\Big) = -\frac aL \]</div>
+  <div class="math">\[ \varepsilon = -\frac{a}{L}\begin{pmatrix}1&1\\1&1\end{pmatrix} \]</div>
+  <p><b>Nature :</b> <b>compression bi-axiale + cisaillement</b> (si \(a &gt; 0\)). Le triangle est écrasé dans la direction où le nœud 1 avance.</p>
+  <div class="box idea"><b>Bonus si on te demande d'aller plus loin</b>
+    En diagonalisant (valeurs propres de \(\begin{pmatrix}1&1\\1&1\end{pmatrix}\) : 2 et 0), c'est en fait une <b>compression simple</b> de \(-2a/L\) selon la diagonale à 45°, et rien dans la direction perpendiculaire.
+  </div>
+  <div class="box trap"><b>Pièges de l'exo 1</b>
+    Oublier le ½ de \(\varepsilon_{xy}\) · oublier que \(v\) contribue aussi à \(\varepsilon_{xy}\) (par \(\partial v/\partial x\)) · mettre \(\varphi_iu_i\) dans \(A\).
+  </div>
+</section>
+
+<!-- ========== EX 2 ========== -->
+<section id="ex2" class="ex">
+  <div class="sec-tag"><span class="dot d-blue"></span>Exercice 2 · bleu</div>
+  <h2>Deux barres suspendues, deux matériaux</h2>
+  <div class="ask"><b>Ce qu'on te demande</b>
+    Deux barres (longueur \(L\), section \(S\)) accrochées bout à bout au plafond. En haut, matériau \(E_1\) ; en bas, \(E_2\). Chargement 1 : une masse \(M\) pendue au nœud 3. Chargement 2 : seulement le poids des barres (\(m_1\), \(m_2\)). Puis les deux ensemble.
+  </div>
+  <div class="two">
+    <figure style="margin:0">
+      <svg class="fig" style="max-width:280px" viewBox="0 0 300 300" role="img" aria-label="Barre verticale : nœud 1 au plafond, élément 1 en E1 jusqu'au nœud 2, élément 2 en E2 jusqu'au nœud 3, masse M suspendue">
+        <line x1="90" y1="24" x2="210" y2="24" stroke="var(--ink)" stroke-width="2"/>
+        <g stroke="var(--muted)"><line x1="100" y1="24" x2="90" y2="12"/><line x1="120" y1="24" x2="110" y2="12"/><line x1="140" y1="24" x2="130" y2="12"/><line x1="160" y1="24" x2="150" y2="12"/><line x1="180" y1="24" x2="170" y2="12"/><line x1="200" y1="24" x2="190" y2="12"/></g>
+        <rect x="143" y="24" width="14" height="106" fill="var(--blue-soft)" stroke="var(--blue)" stroke-width="1.5"/>
+        <rect x="143" y="130" width="14" height="100" fill="var(--green-soft)" stroke="var(--green)" stroke-width="1.5"/>
+        <circle cx="150" cy="24" r="5" fill="var(--ink)"/><circle cx="150" cy="130" r="5" fill="var(--ink)"/><circle cx="150" cy="230" r="5" fill="var(--ink)"/>
+        <line x1="150" y1="230" x2="150" y2="252" stroke="var(--ink)" stroke-width="1.5"/>
+        <rect x="126" y="252" width="48" height="34" rx="3" fill="var(--grey-soft)" stroke="var(--ink)" stroke-width="1.5"/>
+        <g stroke="var(--muted)" fill="var(--muted)"><line x1="50" y1="40" x2="50" y2="120"/><polygon points="50,122 46,112 54,112" stroke="none"/></g>
+        <g font-family="Source Sans 3, sans-serif" font-size="15" fill="var(--ink)">
+          <text x="128" y="42">1</text><text x="128" y="136">2</text><text x="128" y="236">3</text>
+          <text x="140" y="275" font-weight="700">M</text>
+          <text x="168" y="74" fill="var(--blue)">élément 1</text><text x="168" y="92" fill="var(--blue)">E₁, L, S</text>
+          <text x="168" y="176" fill="var(--green)">élément 2</text><text x="168" y="194" fill="var(--green)">E₂, L, S</text>
+          <text x="38" y="86" fill="var(--muted)">x</text>
+        </g>
+      </svg>
+      <figcaption>Axe x vers le bas : le poids est positif.</figcaption>
+    </figure>
+    <div>
+      <p class="q">Q1 · K de chaque élément</p>
+      <p>Chaque barre est un ressort \(k = ES/L\). Seul \(E\) change :</p>
+      <div class="math">\[ K_1=\frac{S}{L}\begin{pmatrix}E_1&-E_1\\-E_1&E_1\end{pmatrix}_{(1,2)} \]</div>
+      <div class="math">\[ K_2=\frac{S}{L}\begin{pmatrix}E_2&-E_2\\-E_2&E_2\end{pmatrix}_{(2,3)} \]</div>
+    </div>
+  </div>
+
+  <p class="q">Q2 · K du système (assemblage)</p>
+  <p>3 nœuds, 1 DDL ⇒ grille 3×3. \(K_1\) va dans les cases des nœuds 1-2, \(K_2\) dans celles des nœuds 2-3. Le nœud 2 touche les deux barres ⇒ \(E_1+E_2\) :</p>
+  <div class="math">\[ K=\frac{S}{L}\begin{pmatrix}E_1&-E_1&0\\-E_1&E_1+E_2&-E_2\\0&-E_2&E_2\end{pmatrix} \]</div>
+  <p>Vérif : chaque ligne somme à 0. ✓</p>
+
+  <h3>Chargement 1 : masse M au nœud 3</h3>
+  <p class="q">Q3 · Forces nodales</p>
+  <p>Une seule force : le poids \(Mg\), au nœud 3. Donc \(F = (0,\ 0,\ Mg)^t\).</p>
+  <p class="q">Q4 · Conditions aux limites</p>
+  <p>Le nœud 1 est accroché au plafond : \(u_1 = 0\), et le plafond exerce une réaction inconnue \(F_{R1}\) sur la ligne 1.</p>
+  <div class="math">\[ \frac{S}{L}\begin{pmatrix}E_1&-E_1&0\\-E_1&E_1+E_2&-E_2\\0&-E_2&E_2\end{pmatrix}\begin{pmatrix}0\\u_2\\u_3\end{pmatrix}=\begin{pmatrix}F_{R1}\\0\\Mg\end{pmatrix} \]</div>
+  <p>Inconnues : \(u_2\), \(u_3\), \(F_{R1}\). 3 équations, 3 inconnues. ✓</p>
+
+  <p class="q">Q5 · Résolution (on part du bas)</p>
+  <p><b>Ligne 3</b> (nœud libre) :</p>
+  <div class="math">\[ \frac{SE_2}{L}(u_3-u_2) = Mg \]</div>
+  <p>Sens physique : l'élément 2 porte la masse M.</p>
+  <p><b>Ligne 2 + ligne 3</b> : les termes en \(u_3\) s'annulent :</p>
+  <div class="math">\[ \frac{S}{L}\big[(E_1+E_2)u_2 - E_2u_3\big] + \frac{S}{L}\big[E_2u_3-E_2u_2\big] = 0 + Mg \ \Rightarrow\ \frac{SE_1}{L}u_2 = Mg \]</div>
+  <p>Sens physique : l'élément 1 porte aussi M (tout ce qui pend en dessous de lui).</p>
+  <div class="math">\[ \boxed{u_2=\frac{MgL}{E_1S}},\qquad \boxed{u_3=u_2+\frac{MgL}{E_2S}=\frac{MgL}{S}\Big(\frac1{E_1}+\frac1{E_2}\Big)} \]</div>
+  <p><b>Ligne 1</b> (nœud bloqué) ⇒ réaction :</p>
+  <div class="math">\[ \frac{S}{L}(-E_1u_2) = F_{R1} \ \Rightarrow\ \boxed{F_{R1} = -Mg} \]</div>
+  <p>Signe négatif = vers le haut : le plafond retient le poids. ✓</p>
+  <p><b>Déformations et contraintes</b> (allongement de l'élément / sa longueur, puis \(\sigma = E\varepsilon\)) :</p>
+  <div class="math">\[ \varepsilon_1=\frac{u_2-0}{L}=\frac{Mg}{E_1S},\ \ \sigma_1=E_1\varepsilon_1=\frac{Mg}{S} \]</div>
+  <div class="math">\[ \varepsilon_2=\frac{u_3-u_2}{L}=\frac{Mg}{E_2S},\ \ \sigma_2=\frac{Mg}{S} \]</div>
+  <div class="box why"><b>Interprétation</b>
+    Même contrainte dans les deux barres : elles portent la même charge avec la même section. Mais la déformation est différente : le matériau le plus mou (plus petit \(E\)) s'étire plus. Les deux barres sont en <b>traction</b>.
+  </div>
+
+  <h3>Chargement 2 : poids des barres</h3>
+  <p class="q">Q6 · Forces nodales</p>
+  <p>Barre 1 (poids \(m_1g\)) : \(m_1g/2\) sur les nœuds 1 et 2. Barre 2 (poids \(m_2g\)) : \(m_2g/2\) sur les nœuds 2 et 3. Le nœud 2 reçoit les deux moitiés :</p>
+  <div class="math">\[ F = \Big(\frac{m_1g}{2},\ \ \frac{m_1g}{2}+\frac{m_2g}{2},\ \ \frac{m_2g}{2}\Big)^t \]</div>
+  <p>Vérif : somme \(= (m_1+m_2)g\). ✓</p>
+  <p class="q">Q7 · Conditions aux limites</p>
+  <p>Pareil : \(u_1' = 0\) et on ajoute \(F_{R1}'\) sur la ligne 1 (en plus de \(m_1g/2\)).</p>
+  <div class="math">\[ \frac{S}{L}\begin{pmatrix}E_1&-E_1&0\\-E_1&E_1+E_2&-E_2\\0&-E_2&E_2\end{pmatrix}\begin{pmatrix}0\\u_2'\\u_3'\end{pmatrix}=\begin{pmatrix}\frac{m_1g}{2}+F_{R1}'\\\frac{m_1g}{2}+\frac{m_2g}{2}\\\frac{m_2g}{2}\end{pmatrix} \]</div>
+  <p class="q">Q8 · Résolution (même méthode)</p>
+  <p><b>Ligne 3 :</b> \(\dfrac{SE_2}{L}(u_3'-u_2') = \dfrac{m_2g}{2}\). L'élément 2 porte la moitié basse de son propre poids.</p>
+  <p><b>Lignes 2+3 :</b> \(\dfrac{SE_1}{L}u_2' = \dfrac{m_1g}{2}+\dfrac{m_2g}{2}+\dfrac{m_2g}{2} = \Big(\dfrac{m_1}{2}+m_2\Big)g\).</p>
+  <div class="math">\[ \boxed{u_2'=\Big(\frac{m_1}{2}+m_2\Big)\frac{gL}{E_1S}},\qquad \boxed{u_3'=u_2'+\frac{m_2gL}{2E_2S}} \]</div>
+  <p><b>Ligne 1 :</b> \(-\dfrac{SE_1}{L}u_2' = \dfrac{m_1g}{2}+F_{R1}'\) ⇒ \(-\Big(\dfrac{m_1}{2}+m_2\Big)g - \dfrac{m_1g}{2} = F_{R1}'\) ⇒ \(\boxed{F_{R1}'=-(m_1+m_2)g}\). Le plafond porte tout le poids. ✓</p>
+  <div class="math">\[ \sigma_1'=\Big(\frac{m_1}{2}+m_2\Big)\frac{g}{S},\ \ \varepsilon_1'=\frac{\sigma_1'}{E_1}\qquad\quad \sigma_2'=\frac{m_2g}{2S},\ \ \varepsilon_2'=\frac{\sigma_2'}{E_2} \]</div>
+  <div class="box why"><b>Interprétation</b>
+    En vrai, la contrainte varie <b>le long</b> de chaque barre (le haut porte plus de poids que le bas). La MEF donne une valeur constante par élément, qui est la valeur exacte <b>au milieu</b> de l'élément. Exemple : au milieu de la barre 1, il pend la moitié de la barre 1 et toute la barre 2, soit \((m_1/2 + m_2)g\). ✓
+  </div>
+
+  <h3>Chargement 1 + 2</h3>
+  <p class="q">Q9 · Superposition</p>
+  <p>On additionne simplement les deux résultats :</p>
+  <div class="math">\[ u_2=\Big(M+\frac{m_1}{2}+m_2\Big)\frac{gL}{E_1S} \]</div>
+  <div class="math">\[ u_3=u_2+\Big(M+\frac{m_2}{2}\Big)\frac{gL}{E_2S} \]</div>
+  <div class="math">\[ F_{R1}=-(M+m_1+m_2)g \]</div>
+  <div class="math">\[ \sigma_1=\Big(M+\frac{m_1}{2}+m_2\Big)\frac{g}{S},\qquad \sigma_2=\Big(M+\frac{m_2}{2}\Big)\frac{g}{S} \]</div>
+</section>
+
+<!-- ========== EX 4 ========== -->
+<section id="ex4" class="ex">
+  <div class="sec-tag"><span class="dot d-red"></span>Exercice 4 · rouge</div>
+  <h2>Barre sous son poids : 1, 2 puis 4 éléments</h2>
+  <div class="ask"><b>Ce qu'on te demande</b>
+    Une barre de longueur \(L\), masse \(M\), accrochée en haut. La modéliser avec 1, 2 puis 4 éléments. Tracer la contrainte et comparer avec la vraie solution. Calculer l'énergie élastique et conclure.
+  </div>
+  <p>C'est l'exo 2 avec un seul matériau, mais on change le nombre d'éléments. L'objectif : voir comment la précision s'améliore quand on raffine.</p>
+
+  <h3>La vraie solution (analytique), pour comparer</h3>
+  <p>À la hauteur \(x\) (mesurée depuis le plafond), la barre porte le poids de tout ce qui est en dessous, soit une fraction \(1 - x/L\) de la barre :</p>
+  <div class="math">\[ \sigma(x)=\frac{Mg}{S}\Big(1-\frac{x}{L}\Big), \]</div>
+  <div class="math">\[ u(x)=\int_0^x\frac{\sigma}{E}\,dx=\frac{Mg}{ES}\Big(x-\frac{x^2}{2L}\Big),\qquad u(L)=\frac{MgL}{2ES} \]</div>
+  <p>La contrainte est maximale au plafond (\(Mg/S\)) et nulle en bas.</p>
+
+  <p class="q">Q1 · Modèle à 1 élément</p>
+  <p>\(k = ES/L\). Poids \(Mg\) ⇒ \(Mg/2\) sur chaque nœud. Nœud 1 bloqué ⇒ \(+F_R\).</p>
+  <div class="math">\[ \frac{ES}{L}\begin{pmatrix}1&-1\\-1&1\end{pmatrix}\begin{pmatrix}0\\u_2\end{pmatrix}=\begin{pmatrix}\frac{Mg}2+F_R\\\frac{Mg}2\end{pmatrix} \]</div>
+  <p>Ligne 2 : \(\frac{ES}{L}u_2 = \frac{Mg}{2}\) ⇒ \(u_2 = \dfrac{MgL}{2ES}\). Ligne 1 : \(-\frac{Mg}{2} = \frac{Mg}{2}+F_R\) ⇒ \(F_R = -Mg\). Contrainte : \(\sigma = E\dfrac{u_2}{L} = \dfrac{Mg}{2S}\).</p>
+
+  <p class="q">Q1 · Modèle à 2 éléments</p>
+  <p>Chaque élément fait \(L/2\) ⇒ \(k = \dfrac{ES}{L/2} = \dfrac{2ES}{L}\). Chaque élément pèse \(M/2\) ⇒ \(Mg/4\) par extrémité. Le nœud du milieu reçoit \(Mg/4+Mg/4 = Mg/2\).</p>
+  <div class="math">\[ \frac{2ES}{L}\begin{pmatrix}1&-1&0\\-1&2&-1\\0&-1&1\end{pmatrix}\begin{pmatrix}0\\u_2\\u_3\end{pmatrix}=\begin{pmatrix}\frac{Mg}4+F_R\\\frac{Mg}2\\\frac{Mg}4\end{pmatrix} \]</div>
+  <p>Avec l'astuce du bas vers le haut (\(k\times\) allongement = poids en dessous) :</p>
+  <ul>
+    <li>élément 2 : \(k(u_3-u_2) = \frac{Mg}{4}\)</li>
+    <li>élément 1 : \(k\,u_2 = \frac{Mg}{4}+\frac{Mg}{2} = \frac{3Mg}{4}\)</li>
+  </ul>
+  <div class="math">\[ u_2=\frac{3MgL}{8ES},\qquad u_3=\frac{MgL}{2ES},\qquad F_R=-Mg \]</div>
+  <div class="math">\[ \sigma_1=E\,\frac{u_2}{L/2}=\frac{3Mg}{4S},\qquad \sigma_2=E\,\frac{u_3-u_2}{L/2}=\frac{Mg}{4S} \]</div>
+  <div class="box trap"><b>Piège (dans tes notes)</b>
+    \(\varepsilon_1 = u_2/(L/2)\), pas \(u_2/L\). Tu avais trouvé \(3/8\) au lieu de \(3/4\) à cause de ça.
+  </div>
+
+  <p class="q">Q1 · Modèle à 4 éléments</p>
+  <p>\(k = 4ES/L\). Forces : \(Mg/8\) aux deux bouts, \(Mg/4\) aux 3 nœuds intérieurs. Du bas vers le haut, chaque élément porte ce qui est en dessous :</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Élément</th><th>Porte (poids en dessous)</th><th>Allongement \(=\) porte / k</th><th>\(\sigma_e\) = porte / S</th></tr></thead>
+    <tbody>
+      <tr><td>4 (bas)</td><td>\(\frac18Mg\)</td><td>\(\frac{1}{32}\frac{MgL}{ES}\)</td><td>\(\frac18\frac{Mg}{S}\)</td></tr>
+      <tr><td>3</td><td>\(\frac18+\frac14=\frac38Mg\)</td><td>\(\frac{3}{32}\frac{MgL}{ES}\)</td><td>\(\frac38\frac{Mg}{S}\)</td></tr>
+      <tr><td>2</td><td>\(\frac58Mg\)</td><td>\(\frac{5}{32}\frac{MgL}{ES}\)</td><td>\(\frac58\frac{Mg}{S}\)</td></tr>
+      <tr><td>1 (haut)</td><td>\(\frac78Mg\)</td><td>\(\frac{7}{32}\frac{MgL}{ES}\)</td><td>\(\frac78\frac{Mg}{S}\)</td></tr>
+    </tbody>
+  </table></div>
+  <p>On cumule les allongements depuis le plafond :</p>
+  <div class="math">\[ U=\frac{MgL}{32\,ES}\begin{pmatrix}0&7&12&15&16\end{pmatrix}^t,\qquad F_R=-Mg \]</div>
+  <p>En bas : \(16/32 = 1/2\) ⇒ \(u = \frac{MgL}{2ES}\), comme dans les deux autres modèles.</p>
+  <div class="box keep"><b>Résultat clé à retenir</b>
+    Les 3 modèles donnent les <b>déplacements exacts aux nœuds</b> (vérifie : \(u(L/2)\) exact \(= \frac{3MgL}{8ES}\), identique au modèle à 2 éléments). Ce qui manque de précision, c'est la <b>contrainte</b> : elle est constante par élément.
+  </div>
+
+  <p class="q">Q2 · Contrainte le long de la barre</p>
+  <figure>
+    <svg class="fig" style="max-width:640px" viewBox="0 0 640 330" role="img" aria-label="Contrainte le long de la barre : droite analytique et paliers MEF pour 1, 2 et 4 éléments">
+      <g font-family="JetBrains Mono, monospace" font-size="12" fill="var(--muted)">
+        <line x1="70" y1="290" x2="600" y2="290" stroke="var(--muted)" stroke-width="1"/>
+        <line x1="70" y1="290" x2="70" y2="24" stroke="var(--muted)" stroke-width="1"/>
+        <g stroke="var(--line)" stroke-width="1">
+          <line x1="70" y1="225" x2="590" y2="225"/><line x1="70" y1="160" x2="590" y2="160"/><line x1="70" y1="95" x2="590" y2="95"/><line x1="70" y1="30" x2="590" y2="30"/>
+        </g>
+        <text x="60" y="294" text-anchor="end">0</text>
+        <text x="60" y="229" text-anchor="end">1/4</text>
+        <text x="60" y="164" text-anchor="end">1/2</text>
+        <text x="60" y="99" text-anchor="end">3/4</text>
+        <text x="60" y="34" text-anchor="end">1</text>
+        <text x="70" y="310" text-anchor="middle">0</text>
+        <text x="200" y="310" text-anchor="middle">L/4</text>
+        <text x="330" y="310" text-anchor="middle">L/2</text>
+        <text x="460" y="310" text-anchor="middle">3L/4</text>
+        <text x="590" y="310" text-anchor="middle">L</text>
+        <text x="600" y="326" text-anchor="end">x (depuis le plafond)</text>
+        <text x="74" y="16">σ / (Mg/S)</text>
+      </g>
+      <line x1="70" y1="30" x2="590" y2="290" stroke="var(--ink)" stroke-width="2" stroke-dasharray="6 5"/>
+      <polyline points="70,160 590,160" fill="none" stroke="#D98B2B" stroke-width="2.5"/>
+      <polyline points="70,95 330,95 330,225 590,225" fill="none" stroke="#2FA56A" stroke-width="2.5"/>
+      <polyline points="70,62.5 200,62.5 200,127.5 330,127.5 330,192.5 460,192.5 460,257.5 590,257.5" fill="none" stroke="var(--blue)" stroke-width="2.5"/>
+      <g font-family="Source Sans 3, sans-serif" font-size="13">
+        <rect x="380" y="30" width="206" height="86" fill="var(--sheet)" stroke="var(--line)"/>
+        <line x1="392" y1="48" x2="420" y2="48" stroke="var(--ink)" stroke-width="2" stroke-dasharray="6 5"/><text x="428" y="52" fill="var(--ink)">vraie solution</text>
+        <line x1="392" y1="68" x2="420" y2="68" stroke="#D98B2B" stroke-width="2.5"/><text x="428" y="72" fill="var(--ink)">1 élément</text>
+        <line x1="392" y1="88" x2="420" y2="88" stroke="#2FA56A" stroke-width="2.5"/><text x="428" y="92" fill="var(--ink)">2 éléments</text>
+        <line x1="392" y1="108" x2="420" y2="108" stroke="var(--blue)" stroke-width="2.5"/><text x="428" y="112" fill="var(--ink)">4 éléments</text>
+      </g>
+    </svg>
+    <figcaption>Chaque palier coupe la vraie droite au milieu de son élément. Au plafond (là où c'est le plus dangereux), la MEF sous-estime : 1/2, 3/4, 7/8 au lieu de 1. L'erreur vaut 1/(2N) : elle diminue quand on raffine.</figcaption>
+  </figure>
+
+  <p class="q">Q3 · Énergie élastique</p>
+  <p>Méthode la plus rapide : \(W = \tfrac12\,F^tU\) (la réaction ne compte pas car \(u_1 = 0\)). On note \(W_0=\dfrac{(Mg)^2L}{ES}\).</p>
+  <p>Exemple 1 élément : \(W = \tfrac12\cdot\frac{Mg}{2}\cdot\frac{MgL}{2ES} = \frac{W_0}{8}\).</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Modèle</th><th>Calcul \(\tfrac12F^tU\) (en \(W_0\))</th><th>W / W₀</th><th>% du vrai</th></tr></thead>
+    <tbody>
+      <tr><td>1 élément</td><td>\(\frac12\cdot\frac12\cdot\frac12\)</td><td>1/8 = 0,125</td><td>75 %</td></tr>
+      <tr><td>2 éléments</td><td>\(\frac12\big(\frac12\cdot\frac38+\frac14\cdot\frac12\big)\)</td><td>5/32 ≈ 0,156</td><td>93,8 %</td></tr>
+      <tr><td>4 éléments</td><td>\(\frac12\big(\frac14\cdot\frac{7+12+15}{32}+\frac18\cdot\frac{16}{32}\big)\)</td><td>21/128 ≈ 0,164</td><td>98,4 %</td></tr>
+      <tr><td>Vraie solution</td><td>\(\int_0^L\frac{\sigma^2S}{2E}dx\)</td><td>1/6 ≈ 0,167</td><td>100 %</td></tr>
+    </tbody>
+  </table></div>
+  <div class="box keep"><b>Conclusion à écrire</b>
+    L'énergie MEF augmente avec le nombre d'éléments et se rapproche de la vraie valeur <b>par en dessous</b> : le modèle MEF est un peu trop rigide. Plus d'éléments = plus précis, mais calcul plus long. (Formule : \(W_N = \frac{W_0}{6}\big(1-\frac1{4N^2}\big)\).)
+  </div>
+</section>
+
+<!-- ========== EX 5 ========== -->
+<section id="ex5" class="ex">
+  <div class="sec-tag"><span class="dot d-red"></span>Exercice 5 · rouge</div>
+  <h2>Treillis : deux barres à ±45°</h2>
+  <div class="ask"><b>Ce qu'on te demande</b>
+    Deux barres identiques (longueur \(L\), masse \(M\)) forment un « toit ». Nœuds 1 et 3 bloqués en bas, nœud 2 au sommet. 2 DDL par nœud (\(u\), \(v\)). (1) Écrire K de chaque barre et K du système. (2) Résoudre avec une force F horizontale au nœud 2, puis avec le poids des barres. (3) Pouvait-on utiliser la symétrie ?
+  </div>
+  <figure>
+    <svg class="fig" style="max-width:400px" viewBox="0 0 380 230" role="img" aria-label="Treillis : nœud 1 en bas à gauche, nœud 2 au sommet, nœud 3 en bas à droite, force F horizontale au nœud 2">
+      <line x1="70" y1="170" x2="190" y2="50" stroke="var(--blue)" stroke-width="5" stroke-linecap="round"/>
+      <line x1="190" y1="50" x2="310" y2="170" stroke="var(--green)" stroke-width="5" stroke-linecap="round"/>
+      <g fill="var(--grey-soft)" stroke="var(--ink)" stroke-width="1.5">
+        <polygon points="70,170 56,194 84,194"/><polygon points="310,170 296,194 324,194"/>
+      </g>
+      <g stroke="var(--muted)"><line x1="48" y1="194" x2="92" y2="194"/><line x1="288" y1="194" x2="332" y2="194"/>
+        <line x1="54" y1="194" x2="48" y2="202"/><line x1="64" y1="194" x2="58" y2="202"/><line x1="74" y1="194" x2="68" y2="202"/><line x1="84" y1="194" x2="78" y2="202"/>
+        <line x1="294" y1="194" x2="288" y2="202"/><line x1="304" y1="194" x2="298" y2="202"/><line x1="314" y1="194" x2="308" y2="202"/><line x1="324" y1="194" x2="318" y2="202"/></g>
+      <circle cx="70" cy="170" r="5" fill="var(--ink)"/><circle cx="190" cy="50" r="5" fill="var(--ink)"/><circle cx="310" cy="170" r="5" fill="var(--ink)"/>
+      <g stroke="var(--red)" fill="var(--red)" stroke-width="2.5"><line x1="195" y1="50" x2="262" y2="50"/><polygon points="270,50 258,44 258,56" stroke="none"/></g>
+      <path d="M 110 170 A 40 40 0 0 0 98 142" fill="none" stroke="var(--muted)"/>
+      <g stroke="var(--muted)" fill="var(--muted)"><line x1="20" y1="216" x2="60" y2="216"/><polygon points="62,216 54,212 54,220" stroke="none"/><line x1="20" y1="216" x2="20" y2="176"/><polygon points="20,174 16,182 24,182" stroke="none"/></g>
+      <g font-family="Source Sans 3, sans-serif" font-size="15" fill="var(--ink)">
+        <text x="48" y="166">1</text><text x="184" y="36">2</text><text x="322" y="166">3</text>
+        <text x="274" y="46" fill="var(--red)" font-weight="700">F</text>
+        <text x="114" y="160" fill="var(--muted)" font-size="13">45°</text>
+        <text x="100" y="100" fill="var(--blue)">barre 1-2</text><text x="236" y="100" fill="var(--green)">barre 2-3</text>
+        <text x="64" y="226" fill="var(--muted)" font-size="13">x</text><text x="26" y="180" fill="var(--muted)" font-size="13">y</text>
+      </g>
+    </svg>
+  </figure>
+
+  <p class="q">Q1 · K de chaque barre</p>
+  <p>On te donne la formule d'une barre inclinée d'un angle \(\alpha\) (avec \(C=\cos\alpha\), \(S=\sin\alpha\)) :</p>
+  <div class="math">\[ K=\frac{ES}{L}\begin{pmatrix}C^2&CS&-C^2&-CS\\CS&S^2&-CS&-S^2\\-C^2&-CS&C^2&CS\\-CS&-S^2&CS&S^2\end{pmatrix} \]</div>
+  <p>Il suffit de calculer \(C^2\), \(S^2\) et \(CS\) pour chaque barre :</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Barre</th><th>α</th><th>C</th><th>S</th><th>C²</th><th>S²</th><th>CS</th></tr></thead>
+    <tbody>
+      <tr><td>1-2</td><td>+45°</td><td>\(\frac{\sqrt2}{2}\)</td><td>\(\frac{\sqrt2}{2}\)</td><td>½</td><td>½</td><td><b>+½</b></td></tr>
+      <tr><td>2-3</td><td>−45°</td><td>\(\frac{\sqrt2}{2}\)</td><td>\(-\frac{\sqrt2}{2}\)</td><td>½</td><td>½</td><td><b>−½</b></td></tr>
+    </tbody>
+  </table></div>
+  <p>Seul le signe de \(CS\) change. On sort le ½ devant :</p>
+  <div class="math">\[ K_{12}=\frac{ES}{2L}\begin{pmatrix}1&1&-1&-1\\1&1&-1&-1\\-1&-1&1&1\\-1&-1&1&1\end{pmatrix}_{(u_1,v_1,u_2,v_2)} \]</div>
+  <div class="math">\[ K_{23}=\frac{ES}{2L}\begin{pmatrix}1&-1&-1&1\\-1&1&1&-1\\-1&1&1&-1\\1&-1&-1&1\end{pmatrix}_{(u_2,v_2,u_3,v_3)} \]</div>
+
+  <p class="q">Q1 · K du système (6×6)</p>
+  <p>3 nœuds × 2 DDL = 6. Ordre : \((u_1,v_1,u_2,v_2,u_3,v_3)\). \(K_{12}\) occupe les lignes/colonnes 1 à 4, \(K_{23}\) les lignes/colonnes 3 à 6. Elles se chevauchent sur le bloc du nœud 2 (lignes/colonnes 3-4), où on additionne :</p>
+  <div class="math">\[ \begin{pmatrix}1&1\\1&1\end{pmatrix}+\begin{pmatrix}1&-1\\-1&1\end{pmatrix}=\begin{pmatrix}2&0\\0&2\end{pmatrix} \]</div>
+  <div class="math">\[ K=\frac{ES}{2L}\begin{pmatrix}1&1&-1&-1&0&0\\1&1&-1&-1&0&0\\-1&-1&\mathbf{2}&\mathbf{0}&-1&1\\-1&-1&\mathbf{0}&\mathbf{2}&1&-1\\0&0&-1&1&1&-1\\0&0&1&-1&-1&1\end{pmatrix} \]</div>
+
+  <h3>Chargement 1 : force F horizontale au nœud 2</h3>
+  <p class="q">Q2 · Mise en équation</p>
+  <p>Nœuds 1 et 3 bloqués : \(u_1=v_1=u_3=v_3=0\), avec 4 réactions inconnues. Inconnues : \(u_2\), \(v_2\), \(R_{x1}\), \(R_{y1}\), \(R_{x3}\), \(R_{y3}\) (6 inconnues, 6 équations ✓).</p>
+  <div class="math">\[ F=\big(R_{x1},\ R_{y1},\ F,\ 0,\ R_{x3},\ R_{y3}\big)^t \]</div>
+  <p><b>Lignes 3 et 4</b> (nœud 2, libre). Seules les colonnes 3-4 comptent (les autres déplacements sont nuls) :</p>
+  <div class="math">\[ \frac{ES}{2L}\cdot2u_2 = F\ \Rightarrow\ \boxed{u_2=\frac{FL}{ES}}\qquad\qquad \frac{ES}{2L}\cdot2v_2 = 0\ \Rightarrow\ \boxed{v_2=0} \]</div>
+  <p><b>Lignes 1, 2, 5, 6</b> (réactions) : on multiplie chaque ligne par \(U = (0,0,u_2,0,0,0)\), donc on lit juste la colonne 3 × \(u_2\) :</p>
+  <div class="math">\[ R_{x1}=\frac{ES}{2L}(-1)u_2=-\frac F2,\quad R_{y1}=-\frac F2,\quad R_{x3}=-\frac F2,\quad R_{y3}=+\frac F2 \]</div>
+  <p>Vérif : \(\sum F_x = F - \frac F2 - \frac F2 = 0\) ✓, \(\sum F_y = -\frac F2+\frac F2 = 0\) ✓.</p>
+  <p><b>Effort dans les barres.</b> L'allongement d'une barre = déplacement du nœud 2 projeté sur la direction de la barre.</p>
+  <ul>
+    <li>Barre 1-2 (direction \(\frac{1}{\sqrt2}(1,1)\)) : allongement \(= \frac{u_2}{\sqrt2} &gt; 0\) ⇒ <b>traction</b>, \(\sigma = +\dfrac{F}{\sqrt2\,S}\).</li>
+    <li>Barre 2-3 (direction de 2 vers 3 : \(\frac{1}{\sqrt2}(1,-1)\)) : allongement \(= -\frac{u_2}{\sqrt2} &lt; 0\) ⇒ <b>compression</b>, \(\sigma = -\dfrac{F}{\sqrt2\,S}\).</li>
+  </ul>
+  <p><b>Image :</b> pousser le sommet vers la droite étire la barre de gauche et écrase celle de droite.</p>
+
+  <h3>Chargement 2 : poids des barres (sans F)</h3>
+  <p class="q">Q2 · Forces nodales</p>
+  <p>Chaque barre pèse \(Mg\) vers le bas (y vers le haut ⇒ signe −) : \(-Mg/2\) à chacune de ses extrémités. Le nœud 2 touche les deux barres ⇒ \(-Mg\). Les nœuds 1 et 3 : \(-Mg/2\) + réactions.</p>
+  <div class="math">\[ F=\Big(R_{x1},\ -\frac{Mg}{2}+R_{y1},\ 0,\ -Mg,\ R_{x3},\ -\frac{Mg}{2}+R_{y3}\Big)^t \]</div>
+  <p><b>Lignes 3 et 4 :</b> \(\frac{ES}{L}u_2 = 0\) et \(\frac{ES}{L}v_2 = -Mg\) ⇒</p>
+  <div class="math">\[ \boxed{u_2=0},\qquad \boxed{v_2=-\frac{MgL}{ES}}\ \ \text{(le sommet descend)} \]</div>
+  <p><b>Réactions :</b> on lit la colonne 4 × \(v_2\). Par exemple ligne 1 : \(\frac{ES}{2L}(-1)\cdot v_2 = \frac{ES}{2L}\cdot\frac{MgL}{ES} = \frac{Mg}{2} = R_{x1}\). Ligne 2 : même valeur \(\frac{Mg}{2} = -\frac{Mg}{2}+R_{y1}\) ⇒ \(R_{y1} = Mg\).</p>
+  <div class="math">\[ R_{x1}=+\frac{Mg}2,\quad R_{y1}=Mg,\quad R_{x3}=-\frac{Mg}2,\quad R_{y3}=Mg \]</div>
+  <p>Vérif : verticalement \(Mg+Mg = 2Mg\) = poids total ✓ ; horizontalement \(\frac{Mg}{2}-\frac{Mg}{2}=0\) ✓. Les deux barres sont en <b>compression</b> (\(\sigma = -\frac{Mg}{\sqrt2\,S}\)) : le toit s'écrase sous son poids et pousse les appuis vers l'extérieur, qui repoussent vers l'intérieur.</p>
+
+  <h3>Q3 · Pouvait-on utiliser la symétrie ?</h3>
+  <p>La géométrie et les appuis sont symétriques par rapport à l'axe vertical passant par le nœud 2. Il reste à regarder le chargement :</p>
+  <ul>
+    <li><b>Chargement 1 : non.</b> F est horizontale : dans le miroir elle changerait de sens. Le chargement n'est pas symétrique (d'ailleurs une barre est tendue et l'autre comprimée).</li>
+    <li><b>Chargement 2 : oui.</b> Le poids est symétrique. On garde la barre 1-2 seule. Le nœud 2 est sur le miroir ⇒ on bloque \(u_2 = 0\) (déplacement perpendiculaire au miroir), et il ne reçoit que la moitié de sa charge : \(-Mg/2\).</li>
+  </ul>
+  <p><b>Dimensions après simplification :</b> 2 nœuds × 2 DDL = 4 ⇒ \(K\) : 4×4, \(U\) : 4×1, \(F\) : 4×1.</p>
+  <p>Vérif : ligne 4 de \(K_{12}\) : \(\frac{ES}{2L}v_2 = -\frac{Mg}{2}\) ⇒ \(v_2 = -\frac{MgL}{ES}\). Même résultat. ✓</p>
+</section>
+
+<!-- ========== EX 3 ========== -->
+<section id="ex3" class="ex">
+  <div class="sec-tag"><span class="dot d-blue"></span>Exercice 3 · bleu (questions de cours / TP)</div>
+  <h2>Éprouvette trouée : préparer un modèle</h2>
+  <div class="ask"><b>Ce qu'on te demande</b>
+    Une plaque 120 × 60 × 1 mm avec deux trous, tirée en traction (F à droite, −F à gauche). 6 DDL par nœud. Pas de calcul : il faut (1) simplifier par symétrie, (2) donner les conditions aux limites, (3) découper en zones pour mailler en quadrangles, (4) dire où raffiner.
+  </div>
+  <figure>
+    <svg class="fig" style="max-width:460px" viewBox="0 0 420 230" role="img" aria-label="Plaque avec deux trous sur l'axe vertical central, axes de symétrie en pointillés, quart supérieur droit mis en évidence">
+      <rect x="30" y="20" width="360" height="180" fill="var(--sheet)" stroke="var(--ink)" stroke-width="2"/>
+      <rect x="210" y="20" width="180" height="90" fill="var(--blue-soft)" stroke="var(--blue)" stroke-width="2"/>
+      <circle cx="210" cy="80" r="16" fill="var(--paper)" stroke="var(--ink)" stroke-width="2"/>
+      <circle cx="210" cy="140" r="16" fill="var(--paper)" stroke="var(--ink)" stroke-width="2"/>
+      <line x1="210" y1="8" x2="210" y2="212" stroke="var(--red)" stroke-width="1.5" stroke-dasharray="6 4"/>
+      <line x1="18" y1="110" x2="402" y2="110" stroke="var(--red)" stroke-width="1.5" stroke-dasharray="6 4"/>
+      <g stroke="var(--ink)" fill="var(--ink)" stroke-width="2">
+        <line x1="390" y1="60" x2="408" y2="60"/><polygon points="414,60 405,55 405,65" stroke="none"/>
+        <line x1="390" y1="160" x2="408" y2="160"/><polygon points="414,160 405,155 405,165" stroke="none"/>
+        <line x1="30" y1="60" x2="12" y2="60"/><polygon points="6,60 15,55 15,65" stroke="none"/>
+        <line x1="30" y1="160" x2="12" y2="160"/><polygon points="6,160 15,155 15,165" stroke="none"/>
+      </g>
+      <g font-family="Source Sans 3, sans-serif" font-size="14">
+        <text x="300" y="100" text-anchor="middle" fill="var(--blue)" font-weight="700">on garde ce quart</text>
+        <text x="216" y="224" fill="var(--red)">x = 60</text>
+        <text x="36" y="104" fill="var(--red)">y = 30</text>
+        <text x="100" y="170" fill="var(--muted)">120 × 60 mm</text>
+      </g>
+    </svg>
+    <figcaption>Schéma (non à l'échelle) : deux plans de symétrie en rouge.</figcaption>
+  </figure>
+
+  <p class="q">Q1 · Simplifier par symétrie</p>
+  <p>On vérifie les 4 conditions pour chaque plan (vertical \(x = 60\) et horizontal \(y = 30\)) :</p>
+  <ul>
+    <li><b>géométrie</b> : la plaque et les deux trous sont symétriques ✓ ;</li>
+    <li><b>matériau</b> : le même partout ✓ ;</li>
+    <li><b>chargement</b> : F à droite et −F à gauche se répondent dans le miroir ✓ ;</li>
+    <li><b>appuis</b> : aucun appui dissymétrique ✓.</li>
+  </ul>
+  <p>Donc la solution est symétrique aussi. On garde <b>1/4 de la pièce</b> (60 × 30 mm, avec un demi-trou sur le bord \(x = 60\)). Gain : environ 4 fois moins de nœuds.</p>
+
+  <p class="q">Q2 · Conditions aux limites sur le quart</p>
+  <p>Règle : sur un plan de symétrie, on bloque le déplacement perpendiculaire au plan et les 2 rotations qui feraient sortir la pièce du plan.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Bord du quart</th><th>Ce qu'on bloque</th><th>Pourquoi</th></tr></thead>
+    <tbody>
+      <tr><td>Plan \(x = 60\) (normale x)</td><td>\(u = 0,\ \theta_y = 0,\ \theta_z = 0\)</td><td>les points ne peuvent pas traverser le miroir vertical</td></tr>
+      <tr><td>Plan \(y = 30\) (normale y)</td><td>\(v = 0,\ \theta_x = 0,\ \theta_z = 0\)</td><td>idem pour le miroir horizontal</td></tr>
+      <tr><td>Bord \(x = 120\)</td><td>force \(F/2\) répartie sur les nœuds (règle coin / intérieur)</td><td>le quart ne garde que la moitié de la hauteur chargée</td></tr>
+      <tr><td>Hors plan</td><td>\(w = 0\) sur au moins un nœud</td><td>empêcher la plaque de « flotter » en z</td></tr>
+    </tbody>
+  </table></div>
+  <p>Pas besoin d'encastrement : les deux plans de symétrie empêchent déjà la pièce de glisser ou de tourner dans son plan.</p>
+
+  <p class="q">Q3 · Découper en zones pour des quadrangles</p>
+  <p>Un mailleur « réglé » en quadrangles a besoin de zones à <b>4 côtés</b>. Autour du demi-trou : trace un carré autour du trou, puis relie le trou aux coins du carré par des lignes (à 45°). Chaque morceau obtenu a 4 côtés (dont un courbe, sur le trou). Le reste de la plaque = des rectangles.</p>
+  <p><b>Pourquoi des quadrangles :</b> dans un triangle à 3 nœuds, les \(\varphi\) sont linéaires, donc \(\varepsilon\) est constante dans l'élément : il est trop rigide et peu précis. Dans un quadrangle à 4 nœuds, les \(\varphi\) sont bilinéaires (terme en \(xy\)), donc \(\varepsilon\) peut varier dans l'élément. Plus précis pour le même nombre de nœuds, et le maillage est plus régulier.</p>
+
+  <p class="q">Q4 · Où mettre des éléments plus fins</p>
+  <p><b>Autour des trous</b> : la contrainte y est environ 3 fois plus grande que loin des trous (concentration de contraintes, \(K_t \approx 3\)) et elle varie très vite. <b>Dans les zones étroites</b> (entre les deux trous, et entre un trou et le bord) : la matière qui reste porte tout l'effort. Loin des trous, la contrainte est uniforme (\(F/S\)), donc de gros éléments suffisent.</p>
+  <div class="box idea"><b>Phrase type pour l'exam</b>
+    On raffine là où la contrainte varie vite (gradients forts), car un élément donne une contrainte quasi constante : il faut beaucoup de petits éléments pour suivre une variation rapide.
+  </div>
+</section>
+
+<div class="part">Partie 4 — Avant de rendre ta copie</div>
+
+<section id="pieges">
+  <div class="sec-tag">Pièges et vérifications</div>
+  <h2>Les erreurs qui coûtent des points</h2>
+  <div class="box trap"><b>Erreurs vues dans tes notes</b>
+    <ul style="margin:0">
+      <li><b>Von Mises</b> : le ½ est <b>dans</b> la racine : \(\sqrt{\tfrac12[\dots]}\), pas \(\tfrac12\sqrt{\dots}\).</li>
+      <li><b>Matrice A</b> : \(\varphi_i\) seul, pas \(\varphi_iu_i\).</li>
+      <li><b>Déformation d'un élément</b> : diviser par la longueur de <b>l'élément</b> (\(L/2\) si barre coupée en 2).</li>
+      <li><b>Recopie</b> : « \(u_3 = mg\) » n'a pas d'unité de longueur. C'est \(u_3 = \frac{mgL}{2ES}\).</li>
+      <li><b>Barre quadratique</b> : \(\varphi_3 = \frac{\alpha}{2}(1+\alpha)\), pas \(\frac{\alpha}{L}(1+\alpha)\).</li>
+    </ul>
+  </div>
+  <div class="box keep"><b>Checklist de 2 minutes à la fin de chaque exo</b>
+    <ul style="margin:0">
+      <li><b>Unités</b> : un déplacement doit avoir la forme \(\frac{\text{force}\times\text{longueur}}{E\times S}\).</li>
+      <li><b>K</b> : symétrique, et chaque ligne somme à 0 (en 1D).</li>
+      <li><b>F</b> : la somme des forces appliquées = la charge totale.</li>
+      <li><b>Réactions</b> : \(\sum F_R = -\sum F\) (l'appui porte tout).</li>
+      <li><b>Signes</b> : ça tire ⇒ \(\sigma &gt; 0\) (traction) ; ça pousse ⇒ \(\sigma &lt; 0\) (compression). Est-ce que c'est cohérent avec l'image ?</li>
+      <li><b>Interprétation</b> : une phrase à la fin (traction ou compression, où est le max, \(\sigma &lt; \sigma_e\) ?). Ça rapporte des points « interpréter ».</li>
+    </ul>
+  </div>
+  <div class="box idea"><b>Ce qui tombe à l'exam</b>
+    Écrire φ et A · calculer U en un point · calculer ε à partir des déplacements · K d'une barre · K d'un système de 2-3 éléments · CL + chargement · résoudre (déplacements, ε, σ, réactions) · interpréter. Les exos 1, 2 et 4 couvrent tout ça : refais-les sans regarder la solution.
+  </div>
+</section>
+</div>
+</body>
+</html>
