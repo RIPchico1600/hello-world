@@ -18,5 +18,7 @@ render cv_en.html        Paolo_Khoury_CV_EN.pdf
 render cv_fr.html        Paolo_Khoury_CV_FR.pdf
 # laid-out version: two columns and a photo, for direct sending
 render cv_fr_design.html Paolo_Khoury_CV_FR_Design.pdf
+# lettre de motivation, assortie au CV sobre
+render lettre_fr.html    Paolo_Khoury_Lettre_Motivation.pdf
 
 echo "done"
