@@ -6,7 +6,7 @@
 <style>
 /* Lettre de motivation au format francais classique.
    Meme police que le CV sobre (Carlito = metriques Calibri), marges 2,5 cm.
-   Les passages en gris entre crochets sont a remplacer avant envoi. */
+   Les parentheses et les points de suspension sont a remplacer avant envoi. */
 
 @page { size: A4; margin: 25mm 25mm 20mm 25mm; }
 
@@ -15,7 +15,7 @@
 body {
   font-family: Carlito, Calibri, "Liberation Sans", Arial, sans-serif;
   font-size: 11pt;
-  line-height: 1.38;
+  line-height: 1.44;
   color: #000;
 }
 
@@ -25,7 +25,7 @@ body {
   display: flex;
   justify-content: space-between;
   gap: 15mm;
-  margin-bottom: 7mm;
+  margin-bottom: 10mm;
 }
 
 .expediteur { font-size: 10.5pt; line-height: 1.34; }
@@ -34,39 +34,30 @@ body {
 .destinataire {
   font-size: 10.5pt;
   line-height: 1.34;
-  text-align: left;
   min-width: 62mm;
 }
 
-.lieu-date { text-align: right; margin-bottom: 7mm; }
+.lieu-date { text-align: right; margin-bottom: 10mm; }
 
 .objet {
-  margin-bottom: 6.5mm;
+  font-weight: bold;
+  margin-bottom: 8mm;
   line-height: 1.38;
 }
 
-.objet b { font-weight: bold; }
-
-.appel { margin-bottom: 4mm; }
+.appel { margin-bottom: 5mm; }
 
 p.corps {
   text-align: justify;
-  margin-bottom: 4mm;
+  margin-bottom: 5mm;
 }
 
 .politesse {
-  text-align: justify;
-  margin-top: 5mm;
-  margin-bottom: 9mm;
+  margin-top: 6mm;
+  margin-bottom: 12mm;
 }
 
 .signature { font-weight: bold; }
-
-/* a remplacer avant envoi */
-.rempl {
-  color: #7A7A7A;
-  font-style: italic;
-}
 </style>
 </head>
 <body>
@@ -80,42 +71,39 @@ p.corps {
     linkedin.com/in/paolo-khoury-452849297
   </div>
   <div class="destinataire">
-    <span class="rempl">[Nom de l&rsquo;entreprise]</span><br>
-    <span class="rempl">[Service recrutement ou nom du contact]</span><br>
-    <span class="rempl">[Adresse]</span><br>
-    <span class="rempl">[Code postal, Ville]</span>
+    (entreprise)<br>
+    (service recrutement ou nom du contact)<br>
+    (adresse)<br>
+    (code postal, ville)
   </div>
 </div>
 
 <div class="lieu-date">Palaiseau, le 28 septembre 2026</div>
 
 <div class="objet">
-  <b>Objet&nbsp;: candidature pour un stage de fin d&rsquo;&eacute;tudes de six mois en ing&eacute;nierie des mat&eacute;riaux, de f&eacute;vrier &agrave; ao&ucirc;t 2028</b><br>
-  <span class="rempl">[R&eacute;f&eacute;rence de l&rsquo;annonce, le cas &eacute;ch&eacute;ant]</span>
+  Objet&nbsp;: candidature pour un stage de fin d&rsquo;&eacute;tudes de six mois en ing&eacute;nierie des mat&eacute;riaux, f&eacute;vrier &ndash; ao&ucirc;t 2028
 </div>
 
 <div class="appel">Madame, Monsieur,</div>
 
 <p class="corps">
-<span class="rempl">[Nom de l&rsquo;entreprise]</span> travaille sur
-<span class="rempl">[une phrase pr&eacute;cise&nbsp;: un proc&eacute;d&eacute;, un mat&eacute;riau, une ligne de production ou un site en particulier, pas la notori&eacute;t&eacute; de l&rsquo;entreprise]</span>.
-C&rsquo;est exactement le type de sujet sur lequel je veux passer les six mois de mon projet de fin d&rsquo;&eacute;tudes, et c&rsquo;est pourquoi je vous adresse ma candidature.
+(entreprise) travaille sur &hellip;, et c&rsquo;est le sujet sur lequel j&rsquo;aimerais passer les six mois de mon projet de fin d&rsquo;&eacute;tudes. Je vous envoie donc ma candidature.
 </p>
 
 <p class="corps">
-Je suis en quatri&egrave;me ann&eacute;e du cycle ing&eacute;nieur &agrave; Polytech Paris-Saclay, sp&eacute;cialit&eacute; Mat&eacute;riaux, M&eacute;canique et &Eacute;nergie. Ma formation porte sur la m&eacute;tallurgie, les polym&egrave;res et composites, la m&eacute;canique des mat&eacute;riaux et les techniques de caract&eacute;risation. En avril 2027, je rejoins pour cinq mois le State Key Laboratory of Materials Processing and Die&nbsp;&amp;&nbsp;Mould Technology de l&rsquo;universit&eacute; HUST, &agrave; Wuhan, sur le formage des m&eacute;taux et la technologie des moules et matrices. J&rsquo;aurai donc, au moment de vous rejoindre, une exp&eacute;rience de la mise en forme des mat&eacute;riaux men&eacute;e en laboratoire de recherche.
+Je suis &eacute;l&egrave;ve-ing&eacute;nieur &agrave; Polytech Paris-Saclay, en sp&eacute;cialit&eacute; Mat&eacute;riaux, M&eacute;canique et &Eacute;nergie. J&rsquo;y travaille la m&eacute;tallurgie, les polym&egrave;res et composites, la m&eacute;canique des mat&eacute;riaux et la caract&eacute;risation. En avril 2027, je pars cinq mois en stage de recherche &agrave; l&rsquo;universit&eacute; HUST, &agrave; Wuhan, dans un laboratoire de mise en forme des mat&eacute;riaux et de technologie des moules et matrices.
 </p>
 
 <p class="corps">
-J&rsquo;ai aussi vu l&rsquo;autre c&ocirc;t&eacute;, celui de la production. &Agrave; l&rsquo;&eacute;t&eacute; 2024, chez Oasis Ameron, un fabricant de peintures industrielles &agrave; Dammam, j&rsquo;ai travaill&eacute; au laboratoire de contr&ocirc;le qualit&eacute;&nbsp;: essais ASTM de viscosit&eacute;, de densit&eacute; et de finesse de broyage, d&eacute;termination de l&rsquo;extrait sec en volume, validation des lots avant exp&eacute;dition. J&rsquo;ai suivi un lot complet de primaire antirouille, de la pes&eacute;e des mati&egrave;res premi&egrave;res jusqu&rsquo;au conditionnement. C&rsquo;est dans cette m&ecirc;me usine que j&rsquo;avais fait mon stage d&rsquo;observation de troisi&egrave;me, quatre ans plus t&ocirc;t&nbsp;: c&rsquo;est elle qui m&rsquo;a donn&eacute; envie de faire des mat&eacute;riaux.
+J&rsquo;ai d&eacute;j&agrave; travaill&eacute; en usine. &Agrave; l&rsquo;&eacute;t&eacute; 2024, chez Oasis Ameron, un fabricant de peintures industrielles &agrave; Dammam, j&rsquo;&eacute;tais au laboratoire de contr&ocirc;le qualit&eacute;&nbsp;: essais ASTM de viscosit&eacute;, de densit&eacute; et de finesse de broyage, extrait sec en volume, validation des lots avant exp&eacute;dition. J&rsquo;ai aussi suivi un lot de primaire antirouille du d&eacute;but &agrave; la fin, de la pes&eacute;e des mati&egrave;res premi&egrave;res au conditionnement. C&rsquo;est dans cette usine que j&rsquo;avais fait mon stage de troisi&egrave;me, quatre ans avant, et c&rsquo;est elle qui m&rsquo;a donn&eacute; envie de faire des mat&eacute;riaux.
 </p>
 
 <p class="corps">
-Ce que je peux apporter &agrave; votre &eacute;quipe tient en trois choses&nbsp;: le travail de laboratoire conduit selon une norme et non &agrave; l&rsquo;estime, la tra&ccedil;abilit&eacute; qu&rsquo;impose un environnement chimique, et l&rsquo;habitude de m&rsquo;int&eacute;grer dans une &eacute;quipe dont je ne partage ni la langue ni les r&eacute;f&eacute;rences. J&rsquo;ai grandi en Arabie saoudite, j&rsquo;&eacute;tudie en France et je pars travailler en Chine. Le fran&ccedil;ais et l&rsquo;arabe sont mes langues maternelles, je travaille en anglais&nbsp;(C1).
+Je sais donc travailler en laboratoire en suivant une norme, et tenir la tra&ccedil;abilit&eacute; qu&rsquo;on exige dans un environnement chimique. J&rsquo;ai grandi en Arabie saoudite, j&rsquo;&eacute;tudie en France et je pars travailler en Chine&nbsp;: m&rsquo;adapter &agrave; une nouvelle &eacute;quipe ne me pose pas de probl&egrave;me. Je parle fran&ccedil;ais et arabe, et je travaille en anglais.
 </p>
 
 <p class="corps">
-Je suis disponible pour un entretien quand vous le souhaitez, sur site ou &agrave; distance, et mobile pour la dur&eacute;e du stage. Vous trouverez le d&eacute;tail de mon parcours dans le CV joint.
+Je reste &agrave; votre disposition pour un entretien. Vous trouverez mon CV ci-joint.
 </p>
 
 <p class="politesse">
